@@ -1,5 +1,11 @@
 import { AppLayout, PageHeader } from "@/components/layout";
-import { CheckCircle, AlertTriangle, XCircle, Clock, FileWarning, AlertCircle, ClipboardCheck } from "lucide-react";
+import { 
+  StatusIndicator, 
+  SeverityIndicator, 
+  AlertTypeIndicator,
+  type SeverityLevel,
+  type AlertType,
+} from "@/components/indicators";
 import {
   Table,
   TableBody,
@@ -46,7 +52,13 @@ const complianceIndicators = [
 ];
 
 // Mock data for alerts
-const alertsData = [
+const alertsData: {
+  id: string;
+  type: AlertType;
+  aiSystem: string;
+  severity: SeverityLevel;
+  dueDate: string;
+}[] = [
   {
     id: "ALT-001",
     type: "Risk",
@@ -83,94 +95,6 @@ const alertsData = [
     dueDate: "2026-01-30",
   },
 ];
-
-type StatusType = "success" | "warning" | "critical" | "neutral";
-
-function StatusIndicator({ status, text }: { status: StatusType; text: string }) {
-  const config = {
-    success: { 
-      icon: CheckCircle, 
-      colorClass: "text-[hsl(var(--g-status-success))]" 
-    },
-    warning: { 
-      icon: AlertTriangle, 
-      colorClass: "text-[hsl(var(--g-status-warning))]" 
-    },
-    critical: { 
-      icon: XCircle, 
-      colorClass: "text-[hsl(var(--g-status-critical))]" 
-    },
-    neutral: { 
-      icon: Clock, 
-      colorClass: "text-[hsl(var(--g-text-secondary))]" 
-    },
-  };
-
-  const { icon: Icon, colorClass } = config[status];
-
-  return (
-    <span className={`inline-flex items-center gap-[var(--g-space-2)] ${colorClass}`}>
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      <span className="text-sm">{text}</span>
-    </span>
-  );
-}
-
-function SeverityIndicator({ severity }: { severity: string }) {
-  const config: Record<string, { icon: typeof XCircle; colorClass: string }> = {
-    Critical: { 
-      icon: XCircle, 
-      colorClass: "text-[hsl(var(--g-status-critical))]" 
-    },
-    High: { 
-      icon: AlertTriangle, 
-      colorClass: "text-[hsl(var(--g-status-critical))]" 
-    },
-    Medium: { 
-      icon: AlertCircle, 
-      colorClass: "text-[hsl(var(--g-status-warning))]" 
-    },
-    Low: { 
-      icon: Clock, 
-      colorClass: "text-[hsl(var(--g-text-secondary))]" 
-    },
-  };
-
-  const { icon: Icon, colorClass } = config[severity] || config.Low;
-
-  return (
-    <span className={`inline-flex items-center gap-[var(--g-space-2)] ${colorClass}`}>
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      <span className="text-sm">{severity}</span>
-    </span>
-  );
-}
-
-function AlertTypeIndicator({ type }: { type: string }) {
-  const config: Record<string, { icon: typeof FileWarning; colorClass: string }> = {
-    Risk: { 
-      icon: FileWarning, 
-      colorClass: "text-[hsl(var(--g-status-warning))]" 
-    },
-    Incident: { 
-      icon: AlertCircle, 
-      colorClass: "text-[hsl(var(--g-status-critical))]" 
-    },
-    Audit: { 
-      icon: ClipboardCheck, 
-      colorClass: "text-[hsl(var(--g-text-secondary))]" 
-    },
-  };
-
-  const { icon: Icon, colorClass } = config[type] || config.Audit;
-
-  return (
-    <span className={`inline-flex items-center gap-[var(--g-space-2)] ${colorClass}`}>
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      <span className="text-sm">{type}</span>
-    </span>
-  );
-}
 
 export default function Overview() {
   return (
