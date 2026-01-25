@@ -7,6 +7,7 @@ import {
   Activity,
   AlertCircle,
   ClipboardCheck,
+  Scale,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -18,6 +19,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -79,26 +81,24 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-[hsl(var(--g-border-default))] bg-[hsl(var(--g-surface-card))]"
+      className="border-r border-[hsl(var(--sidebar-border))] bg-[hsl(var(--sidebar-background))] shadow-lg"
     >
-      <SidebarContent>
-        {/* Logo / Brand */}
+      <SidebarContent className="scrollbar-garrigues">
+        {/* Logo / Brand Header */}
         <div 
-          className={`flex items-center h-14 px-[var(--g-space-4)] border-b border-[hsl(var(--g-border-subtle))] ${isCollapsed ? 'justify-center px-[var(--g-space-2)]' : ''}`}
+          className={`flex items-center gap-3 h-16 px-4 border-b border-[hsl(var(--sidebar-border)/0.5)] ${isCollapsed ? 'justify-center px-2' : ''}`}
         >
-          {isCollapsed ? (
-            <span 
-              className="text-lg font-bold text-[hsl(var(--g-text-primary))]"
-              aria-label="AIMS Console"
-            >
-              A
-            </span>
-          ) : (
-            <div>
-              <h1 className="text-sm font-semibold text-[hsl(var(--g-text-primary))] tracking-tight">
+          {/* Garrigues Logo Icon */}
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[hsl(var(--sidebar-accent))] shrink-0">
+            <Scale className="h-5 w-5 text-[hsl(var(--sidebar-foreground))]" aria-hidden="true" />
+          </div>
+          
+          {!isCollapsed && (
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-sm font-bold text-[hsl(var(--sidebar-foreground))] tracking-tight truncate">
                 AIMS Console
               </h1>
-              <p className="text-xs text-[hsl(var(--g-text-secondary))]">
+              <p className="text-xs text-[hsl(var(--sidebar-foreground)/0.7)] truncate">
                 ISO/IEC 42001
               </p>
             </div>
@@ -106,22 +106,29 @@ export function AppSidebar() {
         </div>
 
         {/* Navigation */}
-        <SidebarGroup>
+        <SidebarGroup className="py-4">
           <SidebarGroupLabel 
-            className={`text-xs font-medium text-[hsl(var(--g-text-secondary))] uppercase tracking-wider ${isCollapsed ? 'sr-only' : ''}`}
+            className={`px-4 mb-2 text-[10px] font-medium text-[hsl(var(--sidebar-foreground)/0.6)] uppercase tracking-widest ${isCollapsed ? 'sr-only' : ''}`}
           >
             Modules
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="px-2 space-y-1">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
                       end={item.url === "/"}
-                      className="flex items-center gap-[var(--g-space-3)] px-[var(--g-space-3)] py-[var(--g-space-2)] rounded-[var(--g-radius-sm)] text-[hsl(var(--g-text-secondary))] hover:bg-[hsl(var(--g-surface-hover))] hover:text-[hsl(var(--g-text-primary))] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--g-focus-ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--g-focus-ring-offset))]"
-                      activeClassName="bg-[hsl(var(--g-surface-subtle))] text-[hsl(var(--g-text-primary))] font-medium"
+                      className={`
+                        flex items-center gap-3 px-3 py-2.5 rounded-lg
+                        text-[hsl(var(--sidebar-foreground)/0.8)]
+                        hover:bg-[hsl(var(--sidebar-accent)/0.5)] hover:text-[hsl(var(--sidebar-foreground))]
+                        transition-all duration-150 ease-out
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--sidebar-ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--sidebar-background))]
+                        ${isCollapsed ? 'justify-center' : ''}
+                      `}
+                      activeClassName="bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-accent-foreground))] font-medium shadow-sm"
                       aria-label={`${item.title}: ${item.subtitle}`}
                     >
                       <item.icon 
@@ -130,8 +137,8 @@ export function AppSidebar() {
                       />
                       {!isCollapsed && (
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm truncate">{item.title}</span>
-                          <span className="text-xs text-[hsl(var(--g-text-secondary))] truncate">
+                          <span className="text-sm font-medium truncate">{item.title}</span>
+                          <span className="text-[11px] text-[hsl(var(--sidebar-foreground)/0.6)] truncate">
                             {item.subtitle}
                           </span>
                         </div>
@@ -144,6 +151,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Footer */}
+      <SidebarFooter className="border-t border-[hsl(var(--sidebar-border)/0.5)] p-4">
+        {!isCollapsed && (
+          <div className="text-[10px] text-[hsl(var(--sidebar-foreground)/0.5)] text-center uppercase tracking-wider">
+            Garrigues AIMS v1.0
+          </div>
+        )}
+      </SidebarFooter>
     </Sidebar>
   );
 }
