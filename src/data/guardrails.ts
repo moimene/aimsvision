@@ -11,6 +11,13 @@ export interface ChangeHistoryEntry {
   description: string;
 }
 
+export interface HumanOversightSpec {
+  required: boolean;
+  profile?: string;       // Perfil profesional que debe intervenir
+  sla?: string;           // Plazo de respuesta
+  notes?: string;
+}
+
 export interface Guardrail {
   id: string;
   name: string;
@@ -19,9 +26,17 @@ export interface Guardrail {
   aiSystemName: string;
   action: GuardrailAction;
   humanOversightRequired: boolean;
+  humanOversightSpec?: HumanOversightSpec;
   status: GuardrailStatus;
   version: string;
   description: string;
+  // Legal normative fields (from legal team)
+  legalBasis?: string;           // Requisito normativo concreto
+  legalJustification?: string;   // Justificación legal 3-5 líneas
+  activationCondition?: string;  // Condición de activación
+  nonComplianceConsequence?: string; // Consecuencia de incumplimiento
+  reviewFrequency?: string;      // Frecuencia de revisión
+  updateTriggers?: string[];     // Disparadores de actualización
   linkedRiskIds: string[];
   changeHistory: ChangeHistoryEntry[];
   lastReviewedDate: string;
@@ -44,7 +59,7 @@ export const guardrailActionMapping: Record<GuardrailAction, { status: StatusTyp
 export const guardrailCategories: GuardrailCategory[] = ["Security", "Privacy", "Compliance", "Quality"];
 
 export const guardrailsData: Guardrail[] = [
-  // AIS-001: Agente de Contratación de Préstamos al Consumo
+  // ─── AIS-001: Agente de Contratación de Préstamos al Consumo ───────────────
   {
     id: "GRL-001",
     name: "Completitud Precontractual SECCI",
@@ -53,9 +68,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Agente de Contratación de Préstamos al Consumo",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Control ex-ante por Cumplimiento/Legal sobre el checklist SECCI por producto. No requiere intervención humana por evento individual.",
+    },
     status: "Active",
     version: "1.2.0",
     description: "Bloquea el avance hacia la confirmación del contrato si no se han presentado y aceptado explícitamente todos los elementos obligatorios de la SECCI (Standard European Consumer Credit Information): TAE, coste total del crédito, calendario de pagos, advertencias de riesgo y derecho de desistimiento. Conforme a Directiva (UE) 2023/2225.",
+    legalBasis: "Directiva 2008/48/CE (CCD) arts. 5–6 y Anexo II SECCI; Ley 16/2011 de Crédito al Consumo (ES)",
+    legalJustification: "La normativa de crédito al consumo exige que, antes de vincular al cliente, se le entregue información precontractual normalizada (SECCI) de forma clara y en tiempo oportuno. Este guardrail evita contratos vulnerables por déficit informativo y mitiga el riesgo de reclamaciones, nulidad parcial y sanciones por información engañosa o insuficiente. La transposición española en la Ley 16/2011 refuerza los requisitos de forma y contenido, y la Directiva (UE) 2023/2225 actualiza el marco para créditos al consumo digitales.",
+    activationCondition: "Se intenta registrar intención de aceptación o contratación sin constar la visualización y acuse de recibo de todos los 'key facts' SECCI aplicables al producto y canal (TAE, costes y comisiones, calendario de pagos, advertencias de riesgo, derecho de desistimiento de 14 días).",
+    nonComplianceConsequence: "Riesgo de invalidez del consentimiento, derecho de desistimiento mal instrumentado, sanciones de autoridades de consumo (AEPD, CNMC), resolución contractual y daños reputacionales significativos.",
+    reviewFrequency: "Trimestral y ante cualquier cambio de producto o Términos y Condiciones; revisión extraordinaria ante cambios normativos.",
+    updateTriggers: ["Cambio normativo (CCD, Ley 16/2011)", "Nueva versión de producto o TyC", "Hallazgos de auditoría", "Cambio de canal de contratación"],
     linkedRiskIds: ["RSK-001"],
     changeHistory: [
       { version: "1.2.0", date: "2026-02-01", changedBy: "Carmen Rodríguez", description: "Añadido control de entrega con menos de 24h: activa recordatorio de desistimiento" },
@@ -73,9 +98,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Agente de Contratación de Préstamos al Consumo",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Gestor comercial certificado o agente de atención especializado",
+      sla: "Mismo día hábil para retail; antes de oferta vinculante en hipoteca",
+      notes: "El agente preserva todo el contexto de la conversación para el especialista. El cliente puede solicitar el handoff en cualquier momento.",
+    },
     status: "Active",
     version: "1.0.0",
-    description: "Antes de que el cliente confirme la contratación, el agente deriva obligatoriamente a un especialista humano que verifica la comprensión del cliente y confirma la operación. El agente preserva todo el contexto de la conversación para el especialista. El cliente puede solicitar el handoff en cualquier momento.",
+    description: "Antes de que el cliente confirme la contratación, el agente deriva obligatoriamente a un especialista humano que verifica la comprensión del cliente y confirma la operación. El agente preserva todo el contexto de la conversación para el especialista.",
+    legalBasis: "AI Act art. 14 (supervisión humana en sistemas de alto riesgo); principios de formación del consentimiento en derecho de consumo",
+    legalJustification: "Los sistemas de IA de alto riesgo deben estar sometidos a supervisión humana capaz de prevenir o minimizar riesgos. En contratación asistida, el handoff previo a firma evita errores materiales, sesgos o manipulación y asegura que las dudas sustantivas se resuelvan por un agente cualificado, reforzando la validez del consentimiento informado. La ausencia de este control expone a la entidad a litigios por vicios del consentimiento y a sanciones bajo el AI Act.",
+    activationCondition: "Se detecta incertidumbre alta del modelo, lagunas informativas, cliente vulnerable, señales de coerción o 'advice boundary' no cubierto; o cualquier discrepancia en cálculos o TAE. También se activa ante cualquier intención de firma sin revisión humana previa.",
+    nonComplianceConsequence: "Incumplimiento del AI Act, aumento de litigios por vicios del consentimiento, potencial nulidad o anulabilidad del contrato, sanciones administrativas y obligaciones de reparación al consumidor.",
+    reviewFrequency: "Anual y tras auditorías internas; validar umbrales de incertidumbre y deriva del modelo.",
+    updateTriggers: ["Cambio normativo (AI Act, derecho de consumo)", "Auditoría interna o externa con hallazgos", "Cambio de versión del modelo", "Variación en tasa de escalados"],
     linkedRiskIds: ["RSK-001"],
     changeHistory: [
       { version: "1.0.0", date: "2026-01-20", changedBy: "Carmen Rodríguez", description: "Despliegue inicial – requisito de diseño del sistema" },
@@ -91,9 +128,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Agente de Contratación de Préstamos al Consumo",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Respuesta a incidentes por CISO/Seguridad si hay repetición o impacto. No requiere intervención humana por evento individual.",
+    },
     status: "Active",
     version: "2.0.0",
     description: "Detecta y bloquea intentos de manipulación de las instrucciones del agente mediante técnicas de prompt injection o jailbreak. Analiza patrones como 'ignora las instrucciones anteriores', 'modo desarrollador', 'imprime el system prompt' y similares. Registra el intento y alerta al equipo de seguridad.",
+    legalBasis: "AI Act art. 15 (robustez, precisión, ciberseguridad); RGPD arts. 5(1)(f) y 32 (seguridad del tratamiento)",
+    legalJustification: "La inyección de prompts puede subvertir instrucciones del sistema, exfiltrar datos personales o activar herramientas de forma indebida, vulnerando los principios de integridad y confidencialidad del RGPD y los requisitos de ciberseguridad del AI Act. Este control mitiga brechas de datos, salidas engañosas y acciones no autorizadas, cumpliendo el deber de aplicar medidas técnicas 'state of the art' en protección de sistemas de IA.",
+    activationCondition: "Presencia de patrones de jailbreak o inyección, intentos de desactivar controles del sistema, solicitudes de revelar el system prompt o de usar herramientas no permitidas; inputs desde dominios no confiables o adjuntos con contenido activo.",
+    nonComplianceConsequence: "Brecha de seguridad, exposición de PII o secretos corporativos, incumplimiento de medidas técnicas adecuadas (RGPD art. 32), sanciones y notificaciones obligatorias de incidente a la AEPD; sanciones AI Act por falta de robustez.",
+    reviewFrequency: "Semestral y tras cambios de modelo o herramientas; pruebas adversariales periódicas (red team).",
+    updateTriggers: ["Nueva versión de modelo o toolchain", "Cambio normativo (AI Act, RGPD)", "Hallazgo de incidente de seguridad", "Publicación de nuevas técnicas de ataque"],
     linkedRiskIds: ["RSK-002"],
     changeHistory: [
       { version: "2.0.0", date: "2026-01-15", changedBy: "Jordi Puig", description: "Actualización a modelo de detección basado en transformer" },
@@ -102,7 +149,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-02-15",
     lastReviewedBy: "Víctor Cano",
   },
-  // AIS-002: Motor de Detección de Fraude en Tarjetas v3
+
+  // ─── AIS-002: Motor de Detección de Fraude en Tarjetas v3 ─────────────────
   {
     id: "GRL-004",
     name: "Umbral de Escalado por Importe",
@@ -111,9 +159,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Motor de Detección de Fraude en Tarjetas v3",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Analista de fraude (Panel de Revisión de Fraude)",
+      sla: "30 minutos para casos de alto importe; tiempo casi real para alto riesgo con SCA reforzada inmediata",
+      notes: "La recomendación del modelo se proporciona como contexto pero no se ejecuta automáticamente.",
+    },
     status: "Active",
     version: "2.1.0",
-    description: "Toda transacción marcada como sospechosa con importe superior a 50.000 EUR es escalada automáticamente al Panel de Revisión de Fraude para decisión humana. La recomendación del modelo se proporciona como contexto pero no se ejecuta automáticamente. SLA de respuesta: 30 minutos.",
+    description: "Toda transacción marcada como sospechosa con importe superior a 50.000 EUR es escalada automáticamente al Panel de Revisión de Fraude para decisión humana. La recomendación del modelo se proporciona como contexto pero no se ejecuta automáticamente.",
+    legalBasis: "PSD2 (UE) 2015/2366 art. 97 (SCA); Reglamento Delegado (UE) 2018/389 arts. 18–20 y Anexo (TRA – Transaction Risk Analysis)",
+    legalJustification: "Las RTS sobre SCA permiten exenciones de autenticación reforzada condicionadas a análisis de riesgo transaccional y umbrales por importe, frecuencia y tasa de fraude. Este guardrail fuerza SCA o escalado humano cuando la cuantía o el riesgo superan los límites establecidos en las RTS, reduciendo el fraude residual y garantizando el cumplimiento de las condiciones de TRA. La pérdida de la exención TRA implica responsabilidad incrementada por fraude.",
+    activationCondition: "Operación con importe superior al umbral TRA aplicable (actualmente 50.000 EUR) o score de riesgo por encima de límites internos o de las RTS; repetición anómala de operaciones, MCC de alto riesgo o país de destino en lista de jurisdicciones sensibles.",
+    nonComplianceConsequence: "Pérdida de exenciones TRA, obligación de aplicar SCA en todas las operaciones, responsabilidad incrementada por fraude frente al emisor, sanciones supervisoras y deterioro de KPIs de fraude reportados al regulador.",
+    reviewFrequency: "Trimestral, alineada a tasas de fraude reportadas; monitorización continua a nivel operativo; revalidación de exenciones SCA ante cambios en RTS.",
+    updateTriggers: ["Cambio en RTS/umbrales TRA", "Variación significativa en tasas de fraude", "Cambio normativo (PSD2, PSD3)", "Auditoría de fraude con hallazgos"],
     linkedRiskIds: ["RSK-003"],
     changeHistory: [
       { version: "2.1.0", date: "2025-11-20", changedBy: "Rafael Montoya", description: "Reducción del umbral de 100.000 EUR a 50.000 EUR" },
@@ -130,10 +190,22 @@ export const guardrailsData: Guardrail[] = [
     aiSystemId: "AIS-002",
     aiSystemName: "Motor de Detección de Fraude en Tarjetas v3",
     action: "Escalate",
-    humanOversightRequired: false,
+    humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Model Owner / Equipo de Riesgos de Modelos",
+      sla: "Decisión de recalibración o rollback dentro de los plazos establecidos en el plan de gestión de riesgos del modelo",
+      notes: "Monitorización continua; revisión metodológica semestral.",
+    },
     status: "Active",
     version: "1.3.0",
     description: "Monitorización continua de la deriva del modelo mediante métricas PSI (Population Stability Index) y CSI (Characteristic Stability Index). Si el score de deriva supera el umbral del 20%, se activa una alerta al equipo de Data Science y se inicia el proceso de reentrenamiento.",
+    legalBasis: "AI Act art. 9 (gestión de riesgos continua), art. 15 (rendimiento y robustez a lo largo del ciclo de vida)",
+    legalJustification: "La deriva de datos o de concepto degrada la eficacia del detector de fraude, elevando falsos positivos y negativos. El AI Act exige gestión de riesgos continua durante todo el ciclo de vida del sistema; este control activa mitigaciones o recalibración antes de que la degradación del modelo dañe a clientes o incumpla los SLAs prudenciales establecidos con el supervisor.",
+    activationCondition: "Métricas de performance fuera de banda (AUC por debajo de umbral, FPR/FNR superiores a límites), KS drift en features clave o alertas de out-of-distribution en el espacio de inputs.",
+    nonComplianceConsequence: "Incremento de fraude no detectado o fricción indebida a clientes legítimos, incumplimiento del marco de gestión de riesgos del AI Act y potenciales medidas supervisoras o requerimientos de auditoría.",
+    reviewFrequency: "Mensual para métricas agregadas; monitorización continua para detección de drift; revisión metodológica semestral.",
+    updateTriggers: ["Cambio de versión del modelo o datos de entrenamiento", "Cambio normativo (AI Act)", "Variación en tasas de fraude del sector", "Hallazgo en auditoría de modelo"],
     linkedRiskIds: ["RSK-003"],
     changeHistory: [
       { version: "1.3.0", date: "2025-12-01", changedBy: "David Navarro", description: "Añadido análisis de estacionalidad al cálculo de deriva" },
@@ -142,7 +214,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-20",
     lastReviewedBy: "David Navarro",
   },
-  // AIS-003: Clasificador de Documentación Hipotecaria
+
+  // ─── AIS-003: Clasificador de Documentación Hipotecaria ───────────────────
   {
     id: "GRL-006",
     name: "Umbral de Confianza con Revisión Humana",
@@ -151,9 +224,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Clasificador de Documentación Hipotecaria",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Revisor documental certificado (equipo de Crédito Hipotecario)",
+      sla: "24 horas para documentos en proceso activo de solicitud",
+      notes: "La clasificación no se aplica automáticamente hasta la confirmación del revisor. Se registra la decisión final para reentrenamiento.",
+    },
     status: "Active",
     version: "1.1.0",
-    description: "Documentos clasificados con una puntuación de confianza inferior al 75% son enrutados a la cola de revisión humana. La clasificación no se aplica automáticamente hasta la confirmación del revisor. Se registra la decisión final del revisor para el reentrenamiento del modelo.",
+    description: "Documentos clasificados con una puntuación de confianza inferior al 75% son enrutados a la cola de revisión humana. La clasificación no se aplica automáticamente hasta la confirmación del revisor.",
+    legalBasis: "AI Act art. 14 (supervisión humana); Ley 5/2019 LCCI (evaluación de solvencia en hipoteca)",
+    legalJustification: "La clasificación errónea de documentación hipotecaria puede comprometer la evaluación de solvencia del solicitante y la validez del expediente. La Ley 5/2019 LCCI exige una evaluación rigurosa y documentada de la solvencia; este control garantiza que las clasificaciones de baja confianza sean validadas por un humano antes de incorporarse al expediente.",
+    activationCondition: "Score de confianza del clasificador inferior al 75% para cualquier documento en el flujo de solicitud hipotecaria.",
+    nonComplianceConsequence: "Expedientes hipotecarios con documentación mal clasificada, riesgo de evaluación de solvencia incorrecta, posibles reclamaciones del cliente y sanciones por incumplimiento de la LCCI.",
+    reviewFrequency: "Semestral; revisión del umbral ante cambios en la distribución de documentos o nuevas tipologías.",
+    updateTriggers: ["Cambio normativo (LCCI, AI Act)", "Nueva tipología de documentos", "Variación en tasa de revisión humana", "Hallazgo de auditoría"],
     linkedRiskIds: ["RSK-005"],
     changeHistory: [
       { version: "1.1.0", date: "2025-10-05", changedBy: "Lucía Martínez", description: "Aumento del umbral del 65% al 75%" },
@@ -162,7 +247,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2025-12-20",
     lastReviewedBy: "Lucía Martínez",
   },
-  // AIS-004: Copiloto para Gestores de Banca Privada
+
+  // ─── AIS-004: Copiloto para Gestores de Banca Privada ─────────────────────
   {
     id: "GRL-007",
     name: "Advice Boundary MiFID II",
@@ -171,9 +257,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Copiloto para Gestores de Banca Privada",
     action: "Block",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Asesor financiero registrado y certificado (MiFID/EFPA/EFA)",
+      sla: "Mismo día hábil para validación y firma del consejo",
+      notes: "El copiloto impone disclaimer automático y activa handoff al asesor certificado cuando detecta lenguaje prescriptivo personalizado.",
+    },
     status: "Active",
     version: "1.1.0",
-    description: "Detecta y bloquea la generación de recomendaciones de inversión personalizadas sin que se haya completado y registrado el test de idoneidad MiFID II del cliente. Fuerza la presentación del disclaimer: 'Esta información no constituye recomendación personalizada. Para asesoramiento personalizado, es necesaria una evaluación de idoneidad conforme a MiFID II.' Activa handoff al asesor certificado.",
+    description: "Detecta y bloquea la generación de recomendaciones de inversión personalizadas sin que se haya completado y registrado el test de idoneidad MiFID II del cliente. Fuerza la presentación del disclaimer y activa handoff al asesor certificado.",
+    legalBasis: "MiFID II 2014/65/UE arts. 24–25; Reglamento Delegado (UE) 2017/565; Directrices ESMA sobre idoneidad (ESMA35-43-1163)",
+    legalJustification: "MiFID II distingue con precisión entre información general y recomendación personalizada. Emitir consejo de inversión personalizado sin evaluar idoneidad o conveniencia del cliente constituye una infracción grave que expone a la entidad a sanciones del supervisor (CNMV), nulidad de las recomendaciones y responsabilidad civil por daños al inversor. Este guardrail impone disclaimers, limita la personalización del output y exige handoff a asesor certificado cuando la interacción entra en el ámbito del asesoramiento.",
+    activationCondition: "La interacción contiene lenguaje prescriptivo personalizado ('debería comprar', 'le recomiendo', 'es adecuado para usted') sin haber completado una evaluación de idoneidad o conveniencia vigente y en alcance para el producto en cuestión.",
+    nonComplianceConsequence: "Infracción grave de MiFID II, sanciones del supervisor (CNMV), nulidad de las recomendaciones emitidas y responsabilidad civil por daños patrimoniales al inversor.",
+    reviewFrequency: "Anual y ante cambios de producto o política comercial; auditoría de muestreo trimestral de conversaciones.",
+    updateTriggers: ["Cambio normativo (MiFID II, MiFIR, Directrices ESMA)", "Nuevo producto o categoría de activo", "Auditoría con hallazgos de advice boundary", "Cambio de política comercial"],
     linkedRiskIds: ["RSK-006"],
     changeHistory: [
       { version: "1.1.0", date: "2026-01-10", changedBy: "Alejandro Vidal", description: "Ampliado a productos de renta fija y fondos de inversión" },
@@ -190,9 +288,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Copiloto para Gestores de Banca Privada",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Supervisión del DPO y equipo de Seguridad sobre eficacia del filtrado y revisiones periódicas de trazas. No requiere intervención humana por evento individual.",
+    },
     status: "Active",
     version: "2.0.0",
-    description: "Detecta y enmascara información de identificación personal (PII) y datos financieros sensibles antes de enviarlos al modelo de lenguaje. Entidades detectadas: nombre completo, NIF/NIE, IBAN, número de cuenta, saldo, posiciones de cartera. Los logs del sistema nunca contienen PII en claro.",
+    description: "Detecta y enmascara información de identificación personal (PII) y datos financieros sensibles antes de enviarlos al modelo de lenguaje. Entidades detectadas: nombre completo, NIF/NIE, IBAN, número de cuenta, saldo, posiciones de cartera.",
+    legalBasis: "RGPD arts. 5(1)(c) minimización de datos, 5(1)(f) integridad y confidencialidad, 32 seguridad del tratamiento",
+    legalJustification: "Los principios de minimización y seguridad del RGPD exigen no exponer datos personales a sistemas o terceros de forma innecesaria o desproporcionada. El guardrail elimina o redacta PII antes de enviar el contexto al LLM externo y restringe los logs, reduciendo el riesgo de brecha de datos y asegurando la proporcionalidad del tratamiento. El incumplimiento puede generar obligaciones de notificación a la AEPD y sanciones bajo el art. 83 RGPD.",
+    activationCondition: "Detección de PII o secretos en entradas del usuario, contexto de conversación o histórico; uso de herramientas externas con datos de cliente; adjuntos con metadatos identificativos.",
+    nonComplianceConsequence: "Exposición de datos personales a terceros (proveedor LLM), obligación de notificar brecha a la AEPD en 72 horas, sanciones RGPD (art. 83), medidas correctoras del supervisor y daño reputacional.",
+    reviewFrequency: "Semestral; tras incidentes o cambios de proveedor o versión del LLM; tests adversariales periódicos.",
+    updateTriggers: ["Cambio de proveedor o versión del LLM", "Incidente de privacidad", "Cambio normativo (RGPD, AI Act)", "Nueva categoría de datos en scope"],
     linkedRiskIds: ["RSK-007"],
     changeHistory: [
       { version: "2.0.0", date: "2025-12-01", changedBy: "Jordi Puig", description: "Añadida detección de posiciones de cartera y datos de inversión" },
@@ -201,7 +309,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-15",
     lastReviewedBy: "Marta Soler",
   },
-  // AIS-007: Modelo de Scoring de Crédito para Pymes
+
+  // ─── AIS-007: Modelo de Scoring de Crédito para Pymes ─────────────────────
   {
     id: "GRL-009",
     name: "Bloqueo de Decisión sin Explicación SHAP",
@@ -209,14 +318,25 @@ export const guardrailsData: Guardrail[] = [
     aiSystemId: "AIS-007",
     aiSystemName: "Modelo de Scoring de Crédito para Pymes",
     action: "Block",
-    humanOversightRequired: false,
+    humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Analista de riesgos / Underwriter de crédito empresas",
+      sla: "48 horas para emisión de decisión motivada",
+      notes: "Si no puede generarse explicación SHAP fiable, el analista revisa el caso y emite decisión manual con motivación documentada.",
+    },
     status: "Active",
     version: "1.2.0",
-    description: "Bloquea la emisión de cualquier decisión de crédito (aprobación o denegación) sin que se haya generado y validado el documento de explicabilidad SHAP correspondiente. El documento debe incluir los 5 factores principales que determinan el score y su contribución relativa. Requerimiento del AI Act Art. 86 y normativa de crédito.",
+    description: "Bloquea la emisión de cualquier decisión de crédito (aprobación o denegación) sin que se haya generado y validado el documento de explicabilidad SHAP correspondiente. El documento debe incluir los 5 factores principales que determinan el score y su contribución relativa.",
+    legalBasis: "AI Act art. 13 (transparencia y provisión de información); RGPD art. 22 (decisiones automatizadas) y art. 15(1)(h) (derecho a información sobre lógica aplicada)",
+    legalJustification: "Las decisiones automatizadas con efectos jurídicos significativos sobre personas físicas o jurídicas requieren información significativa sobre la lógica aplicada y los factores relevantes. Si no puede generarse una explicación local fiable mediante SHAP o LIME, no debe emitirse la denegación de forma automática. Este control garantiza el derecho de impugnación del solicitante y la trazabilidad exigida por el AI Act para sistemas de alto riesgo en evaluación de solvencia.",
+    activationCondition: "Intención de comunicar una denegación o condiciones gravosas sin disponer de explicación local válida (SHAP/LIME) y trazabilidad de features y versión del modelo.",
+    nonComplianceConsequence: "Vulneración de derechos RGPD (art. 22), sanciones y obligación de facilitar revisión humana; incumplimiento de transparencia del AI Act, litigios y órdenes de corrección del supervisor.",
+    reviewFrequency: "Anual; validación de estabilidad de explicaciones por versión de modelo; muestreos mensuales de calidad de explicaciones.",
+    updateTriggers: ["Nueva versión del modelo", "Cambio normativo (RGPD, AI Act)", "Hallazgo de inestabilidad en explicaciones", "Auditoría con no conformidad"],
     linkedRiskIds: ["RSK-009"],
     changeHistory: [
-      { version: "1.2.0", date: "2026-01-15", changedBy: "Francesc Bosch", description: "Añadida validación de integridad del documento SHAP (no solo presencia)" },
-      { version: "1.1.0", date: "2025-12-10", changedBy: "Francesc Bosch", description: "Añadido soporte para LIME como alternativa a SHAP" },
+      { version: "1.2.0", date: "2026-01-15", changedBy: "Francesc Bosch", description: "Añadida validación de integridad de la explicación SHAP" },
       { version: "1.0.0", date: "2024-03-01", changedBy: "David Navarro", description: "Despliegue inicial" },
     ],
     lastReviewedDate: "2026-01-25",
@@ -230,9 +350,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Modelo de Scoring de Crédito para Pymes",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Underwriter o Comité de Crédito de Empresas",
+      sla: "24–72 horas según importe y complejidad del expediente",
+      notes: "El modelo proporciona el score, la explicación SHAP y los factores de riesgo como contexto. La decisión final siempre es humana.",
+    },
     status: "Active",
     version: "1.0.0",
-    description: "Todas las denegaciones de crédito y las aprobaciones superiores a 500.000 EUR son enrutadas al Comité de Crédito de Empresas para revisión y decisión final. El modelo proporciona el score, la explicación SHAP y los factores de riesgo como contexto. La decisión final siempre es humana.",
+    description: "Todas las denegaciones de crédito y las aprobaciones superiores a 500.000 EUR son enrutadas al Comité de Crédito de Empresas para revisión y decisión final. El modelo proporciona el score, la explicación SHAP y los factores de riesgo como contexto.",
+    legalBasis: "AI Act art. 14 (supervisión humana); RGPD art. 22(3) (revisión humana de decisiones automatizadas); Directiva 2014/17/UE art. 18 (evaluación de solvencia responsable)",
+    legalJustification: "La negativa automatizada de crédito debe estar sujeta a intervención humana capaz de revertirla y a una evaluación de solvencia adecuada. Este control garantiza el derecho del solicitante a obtener intervención humana, expresar su punto de vista e impugnar la decisión, conforme al RGPD art. 22(3). Reduce además el riesgo de sesgos sistemáticos y cumple con la exigencia de evaluación de solvencia responsable de la Directiva hipotecaria.",
+    activationCondition: "Cualquier denegación automática o decisión borderline; flags de vulnerabilidad del solicitante, discrepancias documentales o importes superiores a 500.000 EUR.",
+    nonComplianceConsequence: "Decisiones impugnables ante el supervisor, sanciones por decisiones exclusivamente automatizadas sin revisión humana, riesgos de discriminación sistémica y de incumplimiento de la normativa de solvencia.",
+    reviewFrequency: "Trimestral; auditoría de calidad de decisiones y tasas de reversión por el Comité de Crédito.",
+    updateTriggers: ["Cambio normativo (RGPD, AI Act, Directiva 2014/17)", "Variación en tasa de reversión humana", "Auditoría con hallazgos de sesgo", "Cambio de política de crédito"],
     linkedRiskIds: ["RSK-008"],
     changeHistory: [
       { version: "1.0.0", date: "2024-03-01", changedBy: "Francesc Bosch", description: "Despliegue inicial – requisito regulatorio" },
@@ -240,7 +372,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-25",
     lastReviewedBy: "Francesc Bosch",
   },
-  // AIS-010: Asistente de Verificación KYC/AML
+
+  // ─── AIS-010: Asistente de Verificación KYC/AML ───────────────────────────
   {
     id: "GRL-011",
     name: "Revisión Humana de Alertas KYC/AML",
@@ -249,9 +382,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Asistente de Verificación KYC/AML",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Analista AML certificado; MLRO (Money Laundering Reporting Officer) para casos de SAR",
+      sla: "24–48 horas para alertas estándar; 4 horas para alertas de alta prioridad; inmediato para coincidencias en listas de sanciones",
+      notes: "Conforme a Ley 10/2010 y 6AMLD. Ninguna acción (bloqueo, reporte al SEPBLAC) puede iniciarse de forma automática.",
+    },
     status: "Active",
     version: "1.1.0",
-    description: "Todas las alertas generadas por el sistema KYC/AML son revisadas por un analista de Cumplimiento antes de cualquier acción (bloqueo de cuenta, reporte a autoridades, etc.). El sistema proporciona la evidencia y el razonamiento como contexto. Conforme a 6AMLD y Ley 10/2010.",
+    description: "Todas las alertas generadas por el sistema KYC/AML son revisadas por un analista de Cumplimiento antes de cualquier acción (bloqueo de cuenta, reporte a autoridades, etc.). El sistema proporciona la evidencia y el razonamiento como contexto.",
+    legalBasis: "Directiva (UE) 2015/849 (AMLD4) y (UE) 2018/843 (AMLD5) CDD/MLRO; Reglamento (UE) 2023/1113 (ToFR); Ley 10/2010 de prevención del blanqueo de capitales (ES)",
+    legalJustification: "La normativa AML exige análisis de alertas por personal cualificado, juicio experto y, en su caso, comunicación de operaciones sospechosas al SEPBLAC. El guardrail impide cierres automáticos indebidos de alertas y asegura trazabilidad, escalado al MLRO y documentación del razonamiento. El incumplimiento puede generar multas significativas, órdenes de mejora supervisora y riesgo penal para los responsables de cumplimiento.",
+    activationCondition: "Alertas por coincidencias en listas PEP o de sanciones, patrones de transacciones inusuales, umbrales de cash-in/out, discrepancias en CDD/EDD o clientes de alto riesgo.",
+    nonComplianceConsequence: "Multas administrativas significativas (hasta el 10% del volumen de negocio anual), órdenes de mejora supervisora, riesgo penal para el MLRO, pérdida de corresponsalías bancarias y daños reputacionales graves.",
+    reviewFrequency: "Semestral; tras cambios en listas de sanciones o escenarios de detección; QA continuo por muestreo de alertas cerradas.",
+    updateTriggers: ["Actualización de listas de sanciones (OFAC, UE, ONU)", "Cambio normativo (AMLD, ToFR, Ley 10/2010)", "Nuevos escenarios de blanqueo identificados", "Auditoría del SEPBLAC o supervisor"],
     linkedRiskIds: ["RSK-010", "RSK-011"],
     changeHistory: [
       { version: "1.1.0", date: "2025-10-01", changedBy: "Andrés Molina", description: "Añadido SLA de revisión de 4 horas para alertas de alta prioridad" },
@@ -260,7 +405,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-08",
     lastReviewedBy: "Andrés Molina",
   },
-  // AIS-011: Motor de Optimización de Precios de Seguros
+
+  // ─── AIS-011: Motor de Optimización de Precios de Seguros ─────────────────
   {
     id: "GRL-012",
     name: "Exclusión de Variables de Género y Proxies",
@@ -268,10 +414,22 @@ export const guardrailsData: Guardrail[] = [
     aiSystemId: "AIS-011",
     aiSystemName: "Motor de Optimización de Precios de Seguros",
     action: "Block",
-    humanOversightRequired: false,
+    humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Actuario y equipo de Cumplimiento Normativo",
+      sla: "Validación previa al despliegue de cualquier nueva versión del modelo",
+      notes: "Estado actual: INEFECTIVO – pendiente de revisión del modelo. El actuario debe validar la selección de variables y las pruebas de equidad antes de cada despliegue.",
+    },
     status: "Active",
     version: "1.0.0",
     description: "Bloquea el uso de la variable de género y de variables proxy identificadas (nombre, código postal de alta correlación con género, etc.) en el cálculo de primas. Conforme a Directiva 2004/113/CE y jurisprudencia Test-Achats (TJUE). Estado: INEFECTIVO – pendiente de revisión del modelo.",
+    legalBasis: "Directiva 2004/113/CE (igualdad de género en bienes y servicios); STJUE C-236/09 (Test-Achats, 2011); Ley Orgánica 3/2007 para la igualdad efectiva (ES)",
+    legalJustification: "La tarificación y optimización de precios de seguros no puede basarse en el sexo ni en proxies que reproduzcan discriminación por razón de género. La STJUE Test-Achats declaró inválida la excepción actuarial de la Directiva 2004/113/CE, estableciendo la prohibición absoluta del uso del sexo como factor de riesgo en seguros. Este guardrail excluye variables prohibidas y exige pruebas de proxy-bias, evitando prácticas ilícitas y protegiendo el principio de igualdad de trato.",
+    activationCondition: "Presencia de la variable sexo/género o de features altamente correlacionadas como proxies de género (ciertos códigos de actividad, variables de salud, patrones de consumo) sin justificación actuarial legítima e independiente del género.",
+    nonComplianceConsequence: "Sanciones por discriminación, nulidad de cláusulas contractuales discriminatorias, litigios colectivos, órdenes de cese y revisión retroactiva de primas aplicadas.",
+    reviewFrequency: "Anual por versión de modelo; ante nuevas fuentes de datos o variables; auditoría actuarial independiente bianual.",
+    updateTriggers: ["Nueva versión del modelo o nuevas variables", "Nueva fuente de datos", "Cambio normativo (Directiva 2004/113, LO 3/2007)", "Hallazgo de proxy-bias en auditoría"],
     linkedRiskIds: ["RSK-012"],
     changeHistory: [
       { version: "1.0.0", date: "2025-06-01", changedBy: "Rosa Llopis", description: "Despliegue inicial" },
@@ -279,7 +437,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2025-12-15",
     lastReviewedBy: "Alejandro Vidal",
   },
-  // AIS-014: Asistente de Negociación de Deuda (Hardship)
+
+  // ─── AIS-014: Asistente de Negociación de Deuda (Hardship) ────────────────
   {
     id: "GRL-013",
     name: "Guardrail de Tono Empático y No Coercitivo",
@@ -287,10 +446,22 @@ export const guardrailsData: Guardrail[] = [
     aiSystemId: "AIS-014",
     aiSystemName: "Asistente de Negociación de Deuda (Hardship)",
     action: "Block",
-    humanOversightRequired: false,
+    humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Equipo de Conducta y Recuperaciones (supervisión de patrones repetidos)",
+      sla: "Inmediato en conversaciones en vivo; revisión de patrones en 24 horas",
+      notes: "Muestreos mensuales de calidad de tono por el equipo de Conducta.",
+    },
     status: "Active",
     version: "1.1.0",
-    description: "Analiza las respuestas generadas antes de enviarlas al cliente para detectar y bloquear lenguaje coercitivo, amenazante o que pueda causar angustia. Incluye un clasificador de tono entrenado específicamente para contextos de hardship financiero. Bloquea frases como 'si no paga', 'consecuencias legales inmediatas' sin el contexto adecuado.",
+    description: "Analiza las respuestas generadas antes de enviarlas al cliente para detectar y bloquear lenguaje coercitivo, amenazante o que pueda causar angustia. Incluye un clasificador de tono entrenado específicamente para contextos de hardship financiero.",
+    legalBasis: "Directiva 2005/29/CE (prácticas comerciales desleales), Anexo I sobre prácticas agresivas; guías EBA sobre clientes vulnerables y forbearance; Ley 3/2004 de morosidad (ES)",
+    legalJustification: "La presión indebida o el lenguaje intimidatorio en contextos de cobro y reestructuración de deuda puede constituir una práctica comercial desleal o agresiva en el sentido de la Directiva 2005/29/CE. Este guardrail filtra el tono de las respuestas y prohíbe amenazas o engaños, protegiendo especialmente a clientes vulnerables y al banco frente a sanciones de consumo y reclamaciones. Las guías EBA sobre forbearance refuerzan la obligación de trato justo y no coercitivo.",
+    activationCondition: "Detección de lenguaje coercitivo, amenazante o engañoso en el output generado; interacción en fase de hardship o impago con cliente identificado como vulnerable.",
+    nonComplianceConsequence: "Sanciones de autoridades de consumo, daños reputacionales, nulidad de acuerdos alcanzados bajo coacción y mayor litigiosidad.",
+    reviewFrequency: "Trimestral; entrenamiento y actualización del clasificador de tono; muestreos mensuales de calidad.",
+    updateTriggers: ["Cambio normativo (Directiva 2005/29, guías EBA)", "Nueva política de cobros o forbearance", "Hallazgo en muestreo de calidad", "Cambio de versión del modelo de tono"],
     linkedRiskIds: ["RSK-014"],
     changeHistory: [
       { version: "1.1.0", date: "2026-01-10", changedBy: "Carmen Rodríguez", description: "Ampliado el diccionario de frases bloqueadas" },
@@ -307,9 +478,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Asistente de Negociación de Deuda (Hardship)",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Validación de contenidos por Legal y Conducta antes de cada despliegue. No requiere intervención humana por evento individual.",
+    },
     status: "Active",
     version: "1.0.0",
     description: "Al inicio de cada conversación de hardship, el agente debe presentar obligatoriamente un resumen de los derechos del deudor: posibilidad de solicitar moratoria, opciones de reestructuración, acceso a mediación y contacto con el Defensor del Cliente. Bloquea el avance a la negociación si no se ha presentado este resumen.",
+    legalBasis: "Directiva 2008/48/CE art. 14 (derecho de desistimiento 14 días); RDL 6/2012 y Código de Buenas Prácticas Bancarias (ES); Ley 5/2019 LCCI para hipoteca (ES)",
+    legalJustification: "Antes de negociar o cerrar acuerdos de reestructuración, el cliente debe conocer sus derechos: plazos de desistimiento, mecanismos de reclamación y alternativas disponibles. El guardrail impone un disclosure previo verificable, mitigando el riesgo de nulidad de acuerdos por déficit informativo y de abusos en situaciones de vulnerabilidad. El Código de Buenas Prácticas Bancarias (RDL 6/2012) refuerza esta obligación para deudores hipotecarios en dificultades.",
+    activationCondition: "Se inicia propuesta o aceptación de plan de reestructuración sin haber mostrado y recogido acuse de recibo de los derechos y alternativas aplicables al caso del deudor.",
+    nonComplianceConsequence: "Nulidad de acuerdos de reestructuración, sanciones de autoridades de consumo, imposibilidad de ejecutar acuerdos y desgaste reputacional.",
+    reviewFrequency: "Trimestral y tras cambios normativos o de políticas de forbearance.",
+    updateTriggers: ["Cambio normativo (RDL 6/2012, LCCI, Código de BP)", "Nueva política de forbearance", "Cambio en derechos del deudor aplicables", "Auditoría con hallazgos"],
     linkedRiskIds: ["RSK-015"],
     changeHistory: [
       { version: "1.0.0", date: "2025-10-15", changedBy: "Alejandro Vidal", description: "Despliegue inicial – requisito legal" },
@@ -325,9 +506,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Asistente de Negociación de Deuda (Hardship)",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Equipo especializado de Hardship / Servicios Sociales internos",
+      sla: "Atención prioritaria; derivación inmediata en conversaciones en vivo",
+      notes: "El cliente no puede ser retenido en el flujo automático una vez detectada la vulnerabilidad.",
+    },
     status: "Active",
     version: "1.0.0",
-    description: "Detecta indicadores de vulnerabilidad del cliente (menciones a problemas de salud, desempleo reciente, situación familiar difícil, signos de angustia) y activa el handoff inmediato al Equipo de Gestión de Hardship especializado. El cliente no puede ser retenido en el flujo automático.",
+    description: "Detecta indicadores de vulnerabilidad del cliente (menciones a problemas de salud, desempleo reciente, situación familiar difícil, signos de angustia) y activa el handoff inmediato al Equipo de Gestión de Hardship especializado.",
+    legalBasis: "AI Act art. 14 (supervisión humana); guías EBA sobre clientes vulnerables y forbearance; Principios de Trato Justo al Cliente (FCA, adaptados a normativa española)",
+    legalJustification: "La identificación de vulnerabilidad requiere trato personalizado y valoración humana que un sistema automatizado no puede proporcionar de forma adecuada. Este guardrail obliga a escalar a equipos especializados para proteger a personas en situación de fragilidad, cumpliendo las expectativas supervisoras de trato justo y las guías EBA sobre clientes vulnerables. La ausencia de este control puede generar acuerdos impugnables y sanciones por conducta inadecuada.",
+    activationCondition: "Señales de vulnerabilidad en la conversación: menciones a problemas de salud, desempleo, discapacidad, sobreendeudamiento, lenguaje de angustia o incapacidad manifiesta de comprender las condiciones.",
+    nonComplianceConsequence: "Incumplimientos de conducta supervisora, sanciones, acuerdos impugnables por falta de capacidad o consentimiento viciado, y riesgo reputacional significativo.",
+    reviewFrequency: "Anual y tras campañas de formación; muestreo mensual de casos escalados para validar calidad.",
+    updateTriggers: ["Cambio normativo (guías EBA, AI Act)", "Nueva política de atención a vulnerables", "Hallazgo en muestreo de calidad", "Cambio de versión del clasificador de vulnerabilidad"],
     linkedRiskIds: ["RSK-014"],
     changeHistory: [
       { version: "1.0.0", date: "2025-10-15", changedBy: "Carmen Rodríguez", description: "Despliegue inicial" },
@@ -335,7 +528,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-22",
     lastReviewedBy: "Carmen Rodríguez",
   },
-  // AIS-016: Simulador de Idoneidad MiFID II
+
+  // ─── AIS-016: Simulador de Idoneidad de Inversiones (MiFID II) ─────────────
   {
     id: "GRL-016",
     name: "Checklist de Completitud MiFID II",
@@ -343,10 +537,22 @@ export const guardrailsData: Guardrail[] = [
     aiSystemId: "AIS-016",
     aiSystemName: "Simulador de Idoneidad de Inversiones (MiFID II)",
     action: "Block",
-    humanOversightRequired: false,
+    humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Asesor financiero registrado que completa y valida la información antes de emitir consejo",
+      sla: "Mismo día hábil",
+      notes: "El sistema bloquea la generación del informe hasta que el asesor complete todos los campos requeridos.",
+    },
     status: "Active",
     version: "1.0.0",
-    description: "Bloquea la generación del informe de idoneidad si no se han completado todos los apartados requeridos por MiFID II: conocimientos y experiencia, situación financiera (ingresos, activos, pasivos), objetivos de inversión (horizonte temporal, tolerancia al riesgo, finalidad) y capacidad para soportar pérdidas.",
+    description: "Bloquea la generación del informe de idoneidad si no se han completado todos los apartados requeridos por MiFID II: conocimientos y experiencia, situación financiera, objetivos de inversión y capacidad para soportar pérdidas.",
+    legalBasis: "MiFID II art. 25; Reglamento Delegado (UE) 2017/565 arts. 54–56; Directrices ESMA sobre idoneidad (ESMA35-43-1163)",
+    legalJustification: "El asesoramiento de inversión exige recabar información suficiente sobre conocimientos y experiencia, situación financiera (ingresos, activos, pasivos) y objetivos de inversión (horizonte temporal, tolerancia al riesgo, finalidad) para evaluar la idoneidad del producto. El guardrail bloquea la emisión de recomendaciones si faltan datos, previniendo el mis-selling y las sanciones supervisoras asociadas. Las Directrices ESMA detallan los campos mínimos que deben recabarse.",
+    activationCondition: "Intento de emitir recomendación personalizada con campos clave de suitability o appropriateness incompletos, desactualizados (más de 12 meses sin revisión) o fuera del alcance del producto.",
+    nonComplianceConsequence: "Sanciones supervisoras de la CNMV, anulabilidad de las recomendaciones emitidas, indemnizaciones al inversor por daños y daño reputacional.",
+    reviewFrequency: "Anual; auditoría de expedientes semestral; ante cambios en cuestionarios o productos.",
+    updateTriggers: ["Cambio normativo (MiFID II, Directrices ESMA)", "Nuevo producto o categoría de activo", "Cambio en cuestionario de idoneidad", "Auditoría con hallazgos de completitud"],
     linkedRiskIds: ["RSK-016"],
     changeHistory: [
       { version: "1.0.0", date: "2025-01-10", changedBy: "Enrique Palau", description: "Despliegue inicial" },
@@ -362,9 +568,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Simulador de Idoneidad de Inversiones (MiFID II)",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Asesor financiero certificado (EFPA/EFA) con firma electrónica reconocida",
+      sla: "Mismo día hábil; control de 4 ojos opcional para recomendaciones de alto importe",
+      notes: "El sistema no puede emitir recomendaciones de inversión de forma autónoma. La firma electrónica del asesor es condición necesaria.",
+    },
     status: "Active",
     version: "1.0.0",
-    description: "Todo informe de idoneidad generado por el sistema requiere la revisión y firma digital del asesor financiero certificado (EFPA/EFA) antes de ser entregado al cliente o utilizado como base para una recomendación. El sistema no puede emitir recomendaciones de inversión de forma autónoma.",
+    description: "Todo informe de idoneidad generado por el sistema requiere la revisión y firma digital del asesor financiero certificado (EFPA/EFA) antes de ser entregado al cliente o utilizado como base para una recomendación.",
+    legalBasis: "MiFID II art. 25(6) (reporte de idoneidad); normas nacionales de registro y certificación de asesores financieros (CNMV); Reglamento Delegado (UE) 2017/565",
+    legalJustification: "La recomendación personalizada de inversión debe ir acompañada de un informe de idoneidad que documente la adecuación al perfil del cliente. En la normativa española, el asesor que emite la recomendación debe estar registrado en la CNMV y poseer la certificación acreditada. Este guardrail fuerza la firma del asesor antes de notificar al cliente, garantizando la trazabilidad y la responsabilidad personal del asesor sobre la recomendación.",
+    activationCondition: "Reporte de idoneidad preparado por el sistema pero sin firma o validación del asesor acreditado, o fuera del plazo establecido para la revisión.",
+    nonComplianceConsequence: "Incumplimiento de MiFID II, sanciones de la CNMV, obligación de rehacer las recomendaciones y pérdida de confianza del cliente.",
+    reviewFrequency: "Anual; control de firmas y tiempos de respuesta trimestral.",
+    updateTriggers: ["Cambio normativo (MiFID II, CNMV)", "Cambio en requisitos de certificación de asesores", "Auditoría con hallazgos de firma", "Cambio en proceso de firma electrónica"],
     linkedRiskIds: ["RSK-016"],
     changeHistory: [
       { version: "1.0.0", date: "2025-01-10", changedBy: "Enrique Palau", description: "Despliegue inicial – requisito MiFID II" },
@@ -372,7 +590,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-18",
     lastReviewedBy: "Enrique Palau",
   },
-  // AIS-006: Agente Informativo de Tarjetas
+
+  // ─── AIS-006: Agente Informativo de Tarjetas ──────────────────────────────
   {
     id: "GRL-018",
     name: "Filtro de Contenido y Seguridad",
@@ -381,9 +600,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Agente Informativo de Tarjetas (App Móvil)",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Revisión de patrones bloqueados por el equipo de Seguridad mensualmente.",
+    },
     status: "Active",
     version: "3.1.0",
     description: "Capa de filtrado multi-nivel que bloquea respuestas dañinas, ofensivas o inapropiadas antes de su entrega al cliente. Incluye detección de desinformación financiera, lenguaje inapropiado y respuestas que excedan el ámbito informativo del agente.",
+    legalBasis: "AI Act art. 15 (robustez y ciberseguridad); RGPD art. 32; Reglamento (UE) 2022/2065 (DSA) para servicios digitales",
+    legalJustification: "Los agentes conversacionales en canales de banca digital deben garantizar que sus outputs no contengan información dañina, engañosa o que exceda el ámbito autorizado. El DSA y el AI Act exigen medidas técnicas para prevenir outputs perjudiciales. Este filtro protege al cliente de desinformación financiera y al banco de responsabilidad por outputs inadecuados.",
+    activationCondition: "Detección de contenido dañino, ofensivo, desinformación financiera o respuestas que excedan el ámbito informativo del agente (p.ej., asesoramiento de inversión, instrucciones de operaciones no autorizadas).",
+    nonComplianceConsequence: "Daño al cliente por desinformación, responsabilidad del banco por outputs inadecuados, sanciones bajo el DSA y daño reputacional.",
+    reviewFrequency: "Mensual para revisión de patrones bloqueados; semestral para actualización del modelo de detección.",
+    updateTriggers: ["Nueva versión del modelo de filtrado", "Cambio normativo (DSA, AI Act)", "Hallazgo de output inadecuado", "Cambio de proveedor de Content Safety"],
     linkedRiskIds: [],
     changeHistory: [
       { version: "3.1.0", date: "2026-01-05", changedBy: "Jordi Puig", description: "Actualización de modelos de detección de desinformación" },
@@ -401,9 +630,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Agente Informativo de Tarjetas (App Móvil)",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Especialista de contratación o flujo de contratación asistida (AIS-001)",
+      sla: "Inmediato (derivación automática al flujo de contratación)",
+      notes: "El agente informativo no puede iniciar ni completar procesos de contratación.",
+    },
     status: "Active",
     version: "1.2.0",
     description: "Detecta la intención de contratación del cliente y deriva a un especialista o al flujo de contratación asistida. El agente informativo no puede iniciar ni completar procesos de contratación. Garantiza la separación entre la función informativa y la función de contratación.",
+    legalBasis: "AI Act art. 13 (transparencia sobre capacidades del sistema); Directiva 2008/48/CE (requisitos precontractuales en contratación)",
+    legalJustification: "La separación entre la función informativa y la función de contratación es esencial para garantizar que el proceso de contratación cumple con todos los requisitos precontractuales (SECCI, handoff humano). Un agente informativo que inicie procesos de contratación podría omitir controles obligatorios, generando contratos vulnerables.",
+    activationCondition: "Detección de intención de contratación explícita ('quiero contratar', 'cómo me doy de alta') o implícita (solicitud de condiciones específicas para un perfil concreto).",
+    nonComplianceConsequence: "Contratos iniciados sin los controles precontractuales obligatorios, riesgo de nulidad y sanciones de consumo.",
+    reviewFrequency: "Semestral; revisión de la tasa de detección de intención de contratación.",
+    updateTriggers: ["Cambio en el catálogo de productos", "Cambio normativo (CCD, AI Act)", "Variación en tasa de detección de intención"],
     linkedRiskIds: [],
     changeHistory: [
       { version: "1.2.0", date: "2025-12-15", changedBy: "Nuria Camps", description: "Mejorada la detección de intención de contratación" },
@@ -412,7 +653,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-10",
     lastReviewedBy: "Nuria Camps",
   },
-  // AIS-017: Sistema AML
+
+  // ─── AIS-017: Sistema de Detección de Blanqueo de Capitales (AML) ──────────
   {
     id: "GRL-020",
     name: "Revisión Humana Obligatoria de Alertas AML",
@@ -421,9 +663,21 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Sistema de Detección de Blanqueo de Capitales (AML)",
     action: "Escalate",
     humanOversightRequired: true,
+    humanOversightSpec: {
+      required: true,
+      profile: "Analista AML certificado; MLRO para casos que requieran SAR al SEPBLAC",
+      sla: "24–72 horas según complejidad; 1 hora para alertas críticas (sanciones, PEP de alto riesgo)",
+      notes: "Ninguna acción (bloqueo de cuenta, reporte al SEPBLAC) puede iniciarse de forma automática. Conforme a Ley 10/2010 y 6AMLD.",
+    },
     status: "Active",
     version: "2.0.0",
-    description: "Todas las alertas generadas por el sistema AML son revisadas por un analista de Cumplimiento antes de cualquier acción. Ninguna acción (bloqueo de cuenta, reporte al SEPBLAC, etc.) puede ser iniciada de forma automática por el sistema. Conforme a Ley 10/2010 y 6AMLD.",
+    description: "Todas las alertas generadas por el sistema AML son revisadas por un analista de Cumplimiento antes de cualquier acción. Ninguna acción puede ser iniciada de forma automática por el sistema. Conforme a Ley 10/2010 y 6AMLD.",
+    legalBasis: "Directiva (UE) 2018/843 (AMLD5); Reglamento (UE) 2023/1113 (ToFR); guías EBA/ESAs sobre supervisión basada en riesgo; Ley 10/2010 (ES)",
+    legalJustification: "Las alertas AML no deben cerrarse automáticamente sin revisión cualificada. Este guardrail garantiza el escalado al analista AML y al MLRO, la documentación del razonamiento y, cuando procede, el reporte de operación sospechosa (SAR) al SEPBLAC, cumpliendo las obligaciones de diligencia debida reforzada y reporte. El incumplimiento puede generar multas administrativas de hasta el 10% del volumen de negocio anual, riesgo penal y pérdida de corresponsalías.",
+    activationCondition: "Alertas con score alto, coincidencias en listas de sanciones o PEP, patrones de transacciones complejos, clientes de alto riesgo o jurisdicciones sensibles identificadas en las listas GAFI.",
+    nonComplianceConsequence: "Multas administrativas significativas, riesgos penales para el MLRO, pérdida de licencias bancarias, cierre de corresponsalías y fuerte daño reputacional.",
+    reviewFrequency: "Semestral; QA continuo con tasas de acierto y tiempos de resolución de alertas.",
+    updateTriggers: ["Actualización de listas GAFI, OFAC, UE", "Cambio normativo (AMLD, ToFR, Ley 10/2010)", "Nuevos tipologías de blanqueo", "Auditoría del SEPBLAC o supervisor"],
     linkedRiskIds: ["RSK-017"],
     changeHistory: [
       { version: "2.0.0", date: "2025-10-01", changedBy: "Andrés Molina", description: "Añadido SLA diferenciado: 1h para alertas críticas, 4h para alertas altas" },
@@ -432,7 +686,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2026-01-05",
     lastReviewedBy: "Andrés Molina",
   },
-  // AIS-018: Copiloto Legal
+
+  // ─── AIS-018: Copiloto de Redacción para el Área Legal ────────────────────
   {
     id: "GRL-021",
     name: "Sanitización de Datos Confidenciales Pre-LLM",
@@ -441,9 +696,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Copiloto de Redacción para el Área Legal",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Supervisión del DPO y del responsable de Servicios Jurídicos sobre eficacia del filtrado. Revisiones periódicas de trazas.",
+    },
     status: "Active",
     version: "1.1.0",
     description: "Detecta y enmascara información confidencial de clientes, datos de estrategia legal y documentos privilegiados antes de enviarlos al modelo de lenguaje externo. Incluye detección de NIF, nombres de partes en litigio, importes de reclamaciones y referencias a procedimientos judiciales en curso.",
+    legalBasis: "RGPD arts. 5(1)(c) y 32; secreto profesional del abogado (Estatuto General de la Abogacía, art. 42); AI Act art. 15",
+    legalJustification: "Los documentos legales contienen información privilegiada protegida por el secreto profesional del abogado y datos personales de partes en litigio. Su exposición a un LLM externo sin sanitización previa vulneraría el secreto profesional, el RGPD y podría comprometer la estrategia legal de la entidad. Este guardrail garantiza que solo se envíen al LLM datos anonimizados o pseudonimizados.",
+    activationCondition: "Detección de PII, datos de estrategia legal, referencias a procedimientos judiciales en curso, importes de reclamaciones o nombres de partes en litigio en el input del usuario.",
+    nonComplianceConsequence: "Vulneración del secreto profesional, exposición de datos personales de partes en litigio, sanciones RGPD y responsabilidad disciplinaria para los abogados implicados.",
+    reviewFrequency: "Semestral; tras incidentes o cambios de proveedor o versión del LLM.",
+    updateTriggers: ["Cambio de proveedor o versión del LLM", "Incidente de privacidad o secreto profesional", "Cambio normativo (RGPD, Estatuto de la Abogacía)"],
     linkedRiskIds: ["RSK-023"],
     changeHistory: [
       { version: "1.1.0", date: "2025-11-15", changedBy: "Jordi Puig", description: "Añadida detección de referencias a procedimientos judiciales" },
@@ -452,7 +717,8 @@ export const guardrailsData: Guardrail[] = [
     lastReviewedDate: "2025-12-20",
     lastReviewedBy: "Alejandro Vidal",
   },
-  // AIS-009: Motor de Recomendación
+
+  // ─── AIS-009: Motor de Recomendación de Productos ─────────────────────────
   {
     id: "GRL-022",
     name: "Advice Boundary en Recomendaciones de Productos",
@@ -461,9 +727,19 @@ export const guardrailsData: Guardrail[] = [
     aiSystemName: "Motor de Recomendación de Productos (Portal Web)",
     action: "Block",
     humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Revisión semestral por Legal y Cumplimiento de los textos de disclaimer y de los criterios de bloqueo.",
+    },
     status: "Active",
     version: "1.0.0",
     description: "Garantiza que las recomendaciones del motor no constituyan asesoramiento financiero personalizado. Bloquea la presentación de recomendaciones que incluyan afirmaciones sobre rentabilidad esperada, adecuación al perfil inversor o comparaciones de riesgo sin la base de un test de idoneidad/conveniencia.",
+    legalBasis: "MiFID II arts. 24–25; AI Act art. 13 (transparencia); normativa de publicidad de productos financieros (CNMV)",
+    legalJustification: "El motor de recomendación opera en el portal web público y no puede emitir recomendaciones personalizadas sin test de idoneidad. Este guardrail garantiza que el output se mantiene en el ámbito de la información general, evitando que el sistema cruce la línea hacia el asesoramiento personalizado sin los controles MiFID II correspondientes.",
+    activationCondition: "Generación de recomendaciones con afirmaciones sobre rentabilidad esperada, adecuación al perfil inversor específico o comparaciones de riesgo personalizadas sin test de idoneidad/conveniencia vigente.",
+    nonComplianceConsequence: "Infracción MiFID II, sanciones de la CNMV, responsabilidad por daños al inversor y daño reputacional.",
+    reviewFrequency: "Semestral; revisión de textos de disclaimer y criterios de bloqueo.",
+    updateTriggers: ["Cambio normativo (MiFID II, normativa CNMV)", "Nuevo producto o categoría", "Auditoría con hallazgos de advice boundary"],
     linkedRiskIds: ["RSK-018"],
     changeHistory: [
       { version: "1.0.0", date: "2024-01-15", changedBy: "Silvia Roca", description: "Despliegue inicial" },

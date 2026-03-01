@@ -8,6 +8,7 @@ import {
   AlertCircle,
   ClipboardCheck,
   Scale,
+  FileCheck2,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -71,6 +72,12 @@ const navigationItems = [
     subtitle: "Certification Readiness",
     url: "/audit",
     icon: ClipboardCheck,
+  },
+  {
+    title: "Certificados de Evidencia",
+    subtitle: "QTSP / RFC 3161",
+    url: "/evidence",
+    icon: FileCheck2,
   },
 ];
 
@@ -156,7 +163,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-[hsl(var(--sidebar-border)/0.5)] p-4">
         {!isCollapsed && (
           <div className="text-[10px] text-[hsl(var(--sidebar-foreground)/0.5)] text-center uppercase tracking-wider">
-            Garrigues AIMS v1.0
+            Powered by g-digital · v1.0
           </div>
         )}
       </SidebarFooter>

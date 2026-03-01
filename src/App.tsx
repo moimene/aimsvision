@@ -12,6 +12,7 @@ import Monitoring from "./pages/Monitoring";
 import Incidents from "./pages/Incidents";
 import Audit from "./pages/Audit";
 import NotFound from "./pages/NotFound";
+import EvidenceCertificates from "./pages/EvidenceCertificates";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/monitoring" element={<Monitoring />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/evidence" element={<EvidenceCertificates />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
