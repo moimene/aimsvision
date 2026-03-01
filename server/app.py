@@ -4,7 +4,9 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DIST_DIR = os.path.join(BASE_DIR, '..', 'dist')
+# In Docker: app.py is at /app/app.py and dist is at /app/dist
+# In dev: app.py is at server/app.py and dist is at dist/ (one level up)
+DIST_DIR = os.path.join(BASE_DIR, 'dist') if os.path.exists(os.path.join(BASE_DIR, 'dist')) else os.path.join(BASE_DIR, '..', 'dist')
 
 app = Flask(__name__, static_folder=DIST_DIR, static_url_path='')
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -205,7 +207,7 @@ def health():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    dist_dir = os.path.join(BASE_DIR, '..', 'dist')
+    dist_dir = DIST_DIR
     file_path = os.path.join(dist_dir, path)
     if path and os.path.exists(file_path):
         return send_from_directory(dist_dir, path)
