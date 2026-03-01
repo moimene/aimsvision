@@ -3,13 +3,11 @@ FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
-
-# Copy source and build
+# Copy all source files
 COPY . .
-RUN pnpm run build
+
+# Install dependencies and build
+RUN npm install && npm run build
 
 # ── Stage 2: Python Flask server ─────────────────────────────────────────────
 FROM python:3.11-slim AS production
