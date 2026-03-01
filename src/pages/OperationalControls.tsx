@@ -47,6 +47,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { InfoTooltip, tooltips } from "@/components/InfoTooltip";
 import { cn } from "@/lib/utils";
 
 function BooleanIndicator({ value, trueText, falseText }: { value: boolean; trueText: string; falseText: string }) {
@@ -474,12 +475,12 @@ export default function OperationalControls() {
               <TableHeader>
                 <TableRow className="bg-[hsl(var(--g-surface-subtle))] hover:bg-[hsl(var(--g-surface-subtle))]">
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Guardrail</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Categoría</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28"><span className="inline-flex items-center gap-1">Categoría <InfoTooltip content={tooltips.guardrailCategory} /></span></TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-52">Sistema de IA</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Acción</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-36">Supervisión</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28"><span className="inline-flex items-center gap-1">Acción <InfoTooltip content={tooltips.guardrailAction} /></span></TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-36"><span className="inline-flex items-center gap-1">Supervisión <InfoTooltip content={tooltips.humanOversight} /></span></TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24">Estado</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-20">Versión</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-20"><span className="inline-flex items-center gap-1">Versión <InfoTooltip content={tooltips.guardrailVersion} /></span></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

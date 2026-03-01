@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { AlertTriangle, XCircle, AlertCircle, CheckCircle, Clock, X } from "lucide-react";
+import { InfoTooltip, tooltips } from "@/components/InfoTooltip";
 
 type ScoreThreshold = "all" | "critical" | "high" | "medium" | "low";
 
@@ -498,12 +499,12 @@ export default function RiskManagement() {
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-44">AI System</TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Category</TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Description</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24">Impact</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24">Prob.</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24"><span className="inline-flex items-center gap-1">Impacto <InfoTooltip content={tooltips.riskImpact} /></span></TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24"><span className="inline-flex items-center gap-1">Prob. <InfoTooltip content={tooltips.riskLikelihood} /></span></TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24">Score</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24">Residual</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Status</TableHead>
-                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-32">Owner</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-24"><span className="inline-flex items-center gap-1">Residual <InfoTooltip content={tooltips.riskLevel} /></span></TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Estado</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-32"><span className="inline-flex items-center gap-1">Owner <InfoTooltip content={tooltips.riskOwner} /></span></TableHead>
                   <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Review</TableHead>
                 </TableRow>
               </TableHeader>
