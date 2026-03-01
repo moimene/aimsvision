@@ -3,6 +3,13 @@ import { LifecycleState } from "@/components/indicators";
 
 export type ComplianceStatus = "Compliant" | "At Risk" | "Non-Compliant" | "Pending";
 
+export interface TechnicalSheet {
+  typology: string;
+  architecture: string;
+  keyGuardrails: { id: string; name: string }[];
+  technicalContact: string;
+}
+
 export interface AISystem {
   id: string;
   name: string;
@@ -17,6 +24,7 @@ export interface AISystem {
   lastReviewDate?: string;
   version?: string;
   interactionsMonthly?: number;
+  technicalSheet: TechnicalSheet;
 }
 
 export const aiSystemsData: AISystem[] = [
@@ -28,12 +36,22 @@ export const aiSystemsData: AISystem[] = [
     provider: "Salesforce Agentforce",
     businessUnit: "Banca Retail",
     lifecycleState: "Production",
-    description: "Agente conversacional que acompaña al cliente en la contratación de préstamos preconcedidos desde la app móvil. Combina IA conversacional con derivación a especialista humano. Basado en Atlas Reasoning Engine con RAG sobre catálogo de productos.",
+    description: "Agente conversacional que acompaña al cliente en la contratación de préstamos preconcedidos desde la app móvil. Combina IA conversacional con derivación a especialista humano.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Crédito al consumo)",
     deployedDate: "2026-02-23",
     lastReviewDate: "2026-02-28",
     version: "1.2.0",
     interactionsMonthly: 48200,
+    technicalSheet: {
+      typology: "Agente Conversacional (RAG + Handoff a Especialista)",
+      architecture: "Motor de razonamiento Atlas con RAG sobre catálogo de productos y APIs de elegibilidad. Conexión con Salesforce Live Agent para handoff. Modelo de lenguaje: GPT-4.1.",
+      keyGuardrails: [
+        { id: "GRL-001", name: "Completitud Precontractual SECCI" },
+        { id: "GRL-002", name: "Handoff Obligatorio Pre-Firma" },
+        { id: "GRL-003", name: "Detección de Prompt Injection" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-002",
@@ -43,12 +61,21 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Medios de Pago",
     lifecycleState: "Production",
-    description: "Modelo de ML en tiempo real para detección de transacciones fraudulentas con tarjeta. Analiza patrones de comportamiento, geolocalización y velocidad de uso. Umbral de escalado a panel humano para transacciones superiores a 50.000 EUR.",
+    description: "Modelo de ML en tiempo real para detección de transacciones fraudulentas con tarjeta. Analiza patrones de comportamiento, geolocalización y velocidad de uso.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Infraestructura crítica financiera)",
     deployedDate: "2025-03-10",
     lastReviewDate: "2026-01-15",
     version: "3.1.2",
     interactionsMonthly: 2850000,
+    technicalSheet: {
+      typology: "Clasificador en Tiempo Real (Gradient Boosting)",
+      architecture: "Modelo XGBoost servido en cluster de Kubernetes con inferencia en <50ms. Feature store en Redis. Conectado al autorizador de transacciones vía Kafka.",
+      keyGuardrails: [
+        { id: "GRL-004", name: "Umbral de Escalado por Importe" },
+        { id: "GRL-005", name: "Monitorización de Deriva del Modelo" },
+      ],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-003",
@@ -58,14 +85,22 @@ export const aiSystemsData: AISystem[] = [
     provider: "Azure AI Document Intelligence",
     businessUnit: "Crédito Hipotecario",
     lifecycleState: "Production",
-    description: "Motor de clasificación automática de documentos en el proceso de solicitud hipotecaria. Categoriza nóminas, declaraciones de IRPF, escrituras y tasaciones. Umbral de confianza del 75% para enrutamiento automático; por debajo, revisión humana.",
+    description: "Motor de clasificación automática de documentos en el proceso de solicitud hipotecaria. Categoriza nóminas, IRPF, escrituras y tasaciones.",
     aiActCategory: "Riesgo Limitado – Obligaciones de transparencia",
     deployedDate: "2024-09-15",
     lastReviewDate: "2025-12-20",
     version: "2.0.1",
     interactionsMonthly: 12400,
+    technicalSheet: {
+      typology: "Inteligencia Documental (OCR + NLU)",
+      architecture: "Servicio gestionado Azure AI Document Intelligence. Modelos pre-entrenados para facturas y documentos de identidad, con un modelo personalizado para nóminas y declaraciones de IRPF.",
+      keyGuardrails: [
+        { id: "GRL-006", name: "Umbral de Confianza con Revisión Humana" },
+      ],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
-  {
+    {
     id: "AIS-004",
     name: "Copiloto para Gestores de Banca Privada",
     riskLevel: "High",
@@ -73,12 +108,21 @@ export const aiSystemsData: AISystem[] = [
     provider: "OpenAI (GPT-4.1)",
     businessUnit: "Banca Privada y Wealth",
     lifecycleState: "Production",
-    description: "Asistente interno para gestores de banca privada que proporciona resúmenes de cartera, análisis de idoneidad MiFID II y preparación de informes de cliente. Requiere guardrail de advice boundary activo para evitar recomendaciones personalizadas no autorizadas.",
+    description: "Asistente interno para gestores que proporciona resúmenes de cartera, análisis de idoneidad MiFID II y preparación de informes de cliente.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de solvencia y scoring)",
     deployedDate: "2025-11-01",
     lastReviewDate: "2026-01-20",
     version: "1.0.3",
     interactionsMonthly: 8900,
+    technicalSheet: {
+      typology: "Copiloto Interno (RAG + LLM)",
+      architecture: "Aplicación web React que consume API de OpenAI (GPT-4.1). El backend en Python gestiona el RAG contra el CRM y el data warehouse de posiciones de cliente, aplicando sanitización de PII antes de enviar a la API.",
+      keyGuardrails: [
+        { id: "GRL-007", name: "Advice Boundary MiFID II" },
+        { id: "GRL-008", name: "Sanitización de PII en Contexto LLM" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-005",
@@ -88,12 +132,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "AWS SageMaker",
     businessUnit: "Operaciones y Red de Oficinas",
     lifecycleState: "Production",
-    description: "Modelo de predicción de fallos en cajeros automáticos (ATMs) basado en telemetría de sensores. Anticipa fallos mecánicos y de dispensación con 72 horas de antelación para optimizar el mantenimiento preventivo.",
+    description: "Modelo de predicción de fallos en cajeros automáticos (ATMs) basado en telemetría de sensores. Anticipa fallos mecánicos y de dispensación.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2024-06-01",
     lastReviewDate: "2025-10-05",
     version: "2.3.0",
     interactionsMonthly: 45000,
+    technicalSheet: {
+      typology: "Predicción de Series Temporales (LSTM)",
+      architecture: "Modelo LSTM entrenado en AWS SageMaker. El pipeline de inferencia se ejecuta diariamente en batch sobre la telemetría de los ATMs ingesta en S3, generando alertas en un dashboard de PowerBI.",
+      keyGuardrails: [],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-006",
@@ -103,12 +153,21 @@ export const aiSystemsData: AISystem[] = [
     provider: "Google Cloud Vertex AI",
     businessUnit: "Medios de Pago",
     lifecycleState: "Production",
-    description: "Agente de IA generativa para informar a clientes sobre características de tarjetas, comparar opciones del catálogo y presentar la opción más adecuada. Diseñado exclusivamente para informar, no para guiar en la contratación. Basado en tecnología Google Cloud.",
+    description: "Agente de IA generativa para informar a clientes sobre características de tarjetas, comparar opciones y presentar la más adecuada. No guía en la contratación.",
     aiActCategory: "Riesgo Limitado – Obligaciones de transparencia (chatbot)",
     deployedDate: "2025-07-15",
     lastReviewDate: "2026-01-10",
     version: "1.5.0",
     interactionsMonthly: 125000,
+    technicalSheet: {
+      typology: "Agente Conversacional (RAG)",
+      architecture: "Basado en Google Vertex AI Search & Conversation. El RAG se alimenta de la documentación pública de productos de tarjetas. Integrado en la app móvil nativa.",
+      keyGuardrails: [
+        { id: "GRL-018", name: "Filtro de Contenido y Seguridad" },
+        { id: "GRL-019", name: "Escalado por Intención de Contratación" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-007",
@@ -118,12 +177,21 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Banca de Empresas",
     lifecycleState: "Production",
-    description: "Modelo de evaluación de riesgo crediticio para pymes que combina datos financieros, comportamiento bancario y variables macroeconómicas sectoriales. Todas las denegaciones requieren revisión por el Comité de Crédito. Requiere explicabilidad SHAP para cada decisión.",
+    description: "Modelo de evaluación de riesgo crediticio para pymes que combina datos financieros, comportamiento bancario y variables macroeconómicas sectoriales.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de solvencia crediticia)",
     deployedDate: "2024-03-01",
     lastReviewDate: "2026-01-25",
     version: "4.2.1",
     interactionsMonthly: 3200,
+    technicalSheet: {
+      typology: "Modelo de Scoring (Ensemble de Modelos)",
+      architecture: "Ensemble de modelos (regresión logística y gradient boosting) que genera un score. El motor de explicabilidad utiliza SHAP para generar los factores de decisión. Servido como API REST interna.",
+      keyGuardrails: [
+        { id: "GRL-009", name: "Bloqueo de Decisión sin Explicación SHAP" },
+        { id: "GRL-010", name: "Revisión Humana de Denegaciones" },
+      ],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-008",
@@ -133,12 +201,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Tesorería y Operaciones",
     lifecycleState: "Production",
-    description: "Sistema de optimización que predice las necesidades de efectivo en la red de oficinas y ATMs para minimizar costes de transporte y maximizar disponibilidad. Recomendaciones con varianza superior al 20% requieren aprobación del responsable de tesorería.",
+    description: "Sistema de optimización que predice las necesidades de efectivo en la red de oficinas y ATMs para minimizar costes de transporte y maximizar disponibilidad.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2024-11-20",
     lastReviewDate: "2025-11-20",
     version: "1.1.0",
     interactionsMonthly: 1200,
+    technicalSheet: {
+      typology: "Optimización de Rutas (Investigación Operativa)",
+      architecture: "Algoritmo de optimización basado en VRP (Vehicle Routing Problem) que se ejecuta en un servidor interno. Consume datos de uso de efectivo y genera un plan de rutas diario.",
+      keyGuardrails: [],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
   {
     id: "AIS-009",
@@ -148,12 +222,20 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Marketing Digital",
     lifecycleState: "Production",
-    description: "Motor de recomendación personalizada de productos financieros en el portal web y app. Utiliza segmentación comportamental y propensión de compra. Incluye guardrail de advice boundary para evitar recomendaciones que constituyan asesoramiento financiero.",
+    description: "Motor de recomendación personalizada de productos financieros en el portal web y app. Utiliza segmentación comportamental y propensión de compra.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2024-01-15",
     lastReviewDate: "2025-09-10",
     version: "3.0.0",
     interactionsMonthly: 890000,
+    technicalSheet: {
+      typology: "Filtrado Colaborativo",
+      architecture: "Motor de recomendación basado en filtrado colaborativo (user-item) implementado en Spark MLlib. Las recomendaciones se calculan en batch y se sirven a través de una API de baja latencia.",
+      keyGuardrails: [
+        { id: "GRL-022", name: "Advice Boundary en Recomendaciones de Productos" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-010",
@@ -163,12 +245,20 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Cumplimiento Normativo",
     lifecycleState: "Production",
-    description: "Sistema de soporte al proceso KYC/AML que automatiza la validación de documentos de identidad, la verificación contra listas de sanciones (OFAC, EU, ONU) y la detección de patrones de riesgo en el onboarding de clientes. Todas las alertas requieren revisión humana.",
+    description: "Sistema de soporte al proceso KYC/AML que automatiza la validación de documentos de identidad y la verificación contra listas de sanciones.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de riesgo y perfilado)",
     deployedDate: "2024-05-20",
     lastReviewDate: "2026-01-08",
     version: "2.5.3",
     interactionsMonthly: 28500,
+    technicalSheet: {
+      typology: "Procesamiento de Documentos y Búsqueda en Listas",
+      architecture: "Pipeline que combina OCR para extracción de datos de documentos, NLU para normalización de nombres y fuzzy matching contra listas de sanciones (OFAC, EU, ONU) almacenadas localmente.",
+      keyGuardrails: [
+        { id: "GRL-011", name: "Revisión Humana de Alertas KYC/AML" },
+      ],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-011",
@@ -178,12 +268,20 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Seguros y Protección",
     lifecycleState: "Production",
-    description: "Modelo de tarificación dinámica para seguros de vida, hogar y protección de pagos. Utiliza variables de comportamiento y perfil del cliente para personalizar primas. Pendiente de revisión de equidad actuarial y conformidad con directiva de género en seguros.",
+    description: "Modelo de tarificación dinámica para seguros. Utiliza variables de comportamiento y perfil del cliente para personalizar primas.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de solvencia y scoring)",
     deployedDate: "2025-06-01",
     lastReviewDate: "2025-12-15",
     version: "1.3.0",
     interactionsMonthly: 15600,
+    technicalSheet: {
+      typology: "Modelo de Precios (GLM - Generalized Linear Model)",
+      architecture: "Modelo GLM tradicional en el sector asegurador, implementado en R y servido a través de una API Plumber. Actualmente bajo revisión por posible uso de variables proxy discriminatorias.",
+      keyGuardrails: [
+        { id: "GRL-012", name: "Exclusión de Variables de Género y Proxies" },
+      ],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
   {
     id: "AIS-012",
@@ -193,12 +291,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "ABBYY FlexiCapture",
     businessUnit: "Banca de Empresas",
     lifecycleState: "Production",
-    description: "Sistema de extracción automática de datos de facturas para el proceso de confirming y factoring. Extrae importes, fechas de vencimiento, NIF de emisor/receptor y referencias. Tasa de error inferior al 1% en condiciones normales.",
+    description: "Sistema de extracción automática de datos de facturas para el proceso de confirming y factoring. Extrae importes, fechas de vencimiento, NIF, etc.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2022-03-01",
     lastReviewDate: "2025-06-01",
     version: "5.1.0",
     interactionsMonthly: 42000,
+    technicalSheet: {
+      typology: "Reconocimiento Óptico de Caracteres (OCR)",
+      architecture: "Software on-premise ABBYY FlexiCapture con plantillas personalizadas para los formatos de factura más comunes de los clientes de la entidad.",
+      keyGuardrails: [],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
   {
     id: "AIS-013",
@@ -208,12 +312,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Calidad y Experiencia de Cliente",
     lifecycleState: "Production",
-    description: "Modelo NLP para análisis automático de respuestas abiertas en encuestas de satisfacción (NPS). Clasifica comentarios por sentimiento, tema y urgencia para priorizar acciones de mejora. Sin impacto directo en decisiones sobre clientes.",
+    description: "Modelo NLP para análisis automático de respuestas abiertas en encuestas de satisfacción (NPS). Clasifica comentarios por sentimiento, tema y urgencia.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2023-09-01",
     lastReviewDate: "2025-08-15",
     version: "2.1.0",
     interactionsMonthly: 18000,
+    technicalSheet: {
+      typology: "Clasificación de Texto (BERT)",
+      architecture: "Modelo basado en BETO (BERT en español) fine-tuneado con un dataset interno de encuestas. Servido como una API para el equipo de Calidad.",
+      keyGuardrails: [],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-014",
@@ -223,12 +333,22 @@ export const aiSystemsData: AISystem[] = [
     provider: "Salesforce Agentforce",
     businessUnit: "Recuperaciones y Cobros",
     lifecycleState: "Production",
-    description: "Agente conversacional que asiste a clientes en situación de dificultad financiera (hardship) para explorar opciones de reestructuración de deuda. Incluye guardrails de tono empático, restricción de lenguaje coercitivo y obligación de informar sobre derechos del deudor. Handoff humano obligatorio para casos complejos.",
+    description: "Agente conversacional que asiste a clientes en situación de dificultad financiera (hardship) para explorar opciones de reestructuración de deuda.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de solvencia y scoring)",
     deployedDate: "2025-10-15",
     lastReviewDate: "2026-01-22",
     version: "1.1.0",
     interactionsMonthly: 4800,
+    technicalSheet: {
+      typology: "Agente Conversacional Empático",
+      architecture: "Similar al AIS-001, pero con un prompt de sistema y guardrails específicos para mantener un tono empático, presentar derechos del deudor y detectar indicadores de vulnerabilidad para un handoff inmediato.",
+      keyGuardrails: [
+        { id: "GRL-013", name: "Guardrail de Tono Empático y No Coercitivo" },
+        { id: "GRL-014", name: "Presentación Obligatoria de Derechos del Deudor" },
+        { id: "GRL-015", name: "Handoff Humano por Vulnerabilidad" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-015",
@@ -238,12 +358,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Negocio Internacional",
     lifecycleState: "Production",
-    description: "Sistema de validación automática de documentos en operaciones de comercio exterior (cartas de crédito, garantías, remesas documentarias). Verifica coherencia documental, plazos y conformidad con Incoterms y UCP 600. Alertas de discrepancia requieren revisión del especialista.",
+    description: "Sistema de validación automática de documentos en operaciones de comercio exterior (cartas de crédito, etc.). Verifica coherencia, plazos y conformidad con Incoterms.",
     aiActCategory: "Riesgo Limitado",
     deployedDate: "2025-04-01",
     lastReviewDate: "2025-12-10",
     version: "1.2.0",
     interactionsMonthly: 2100,
+    technicalSheet: {
+      typology: "Sistema Experto Basado en Reglas",
+      architecture: "Motor de reglas Drools que formaliza la normativa UCP 600 e Incoterms para validar la consistencia entre los diferentes documentos de una operación de comercio exterior.",
+      keyGuardrails: [],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-016",
@@ -253,12 +379,21 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Asesoramiento Financiero",
     lifecycleState: "Production",
-    description: "Herramienta de soporte al asesor para evaluar la idoneidad y conveniencia de productos de inversión conforme a MiFID II. Genera cuestionarios de perfil inversor, analiza la adecuación producto-cliente y genera informes de idoneidad. Requiere revisión y firma del asesor certificado.",
-    aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Evaluación de solvencia y scoring)",
+    description: "Herramienta de soporte al asesor para evaluar la idoneidad y conveniencia de productos de inversión conforme a MiFID II.",
+    aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Asesoramiento de inversión)",
     deployedDate: "2025-01-10",
     lastReviewDate: "2026-01-18",
     version: "2.0.0",
     interactionsMonthly: 6200,
+    technicalSheet: {
+      typology: "Sistema de Soporte a la Decisión (DSS)",
+      architecture: "Aplicación web que implementa la lógica del cuestionario MiFID II y mapea las respuestas del cliente a un perfil de riesgo, que luego se cruza con el riesgo de los productos de inversión para generar un informe de idoneidad.",
+      keyGuardrails: [
+        { id: "GRL-016", name: "Checklist de Completitud MiFID II" },
+        { id: "GRL-017", name: "Firma Obligatoria del Asesor Certificado" },
+      ],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
   {
     id: "AIS-017",
@@ -268,12 +403,20 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Cumplimiento Normativo",
     lifecycleState: "Production",
-    description: "Red de alertas digitales para la detección de patrones de blanqueo de capitales y financiación del terrorismo. Analiza transacciones, redes de relaciones y comportamientos anómalos. Todas las alertas son revisadas por el equipo de Cumplimiento antes de cualquier acción.",
+    description: "Red de alertas para la detección de patrones de blanqueo de capitales. Analiza transacciones, redes de relaciones y comportamientos anómalos.",
     aiActCategory: "Alto Riesgo – Art. 6(2) Anexo III (Infraestructura crítica financiera)",
     deployedDate: "2023-11-01",
     lastReviewDate: "2026-01-05",
     version: "3.4.0",
     interactionsMonthly: 1200000,
+    technicalSheet: {
+      typology: "Detección de Anomalías y Análisis de Grafos",
+      architecture: "Combinación de modelos de detección de anomalías sobre series temporales de transacciones y análisis de grafos (usando Neo4j) para detectar redes de blanqueo. Las alertas se envían a un case management system.",
+      keyGuardrails: [
+        { id: "GRL-020", name: "Revisión Humana Obligatoria de Alertas AML" },
+      ],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-018",
@@ -283,12 +426,20 @@ export const aiSystemsData: AISystem[] = [
     provider: "OpenAI (GPT-4.1)",
     businessUnit: "Servicios Jurídicos",
     lifecycleState: "Production",
-    description: "Asistente de redacción para el equipo legal que ayuda en la elaboración de contratos, cláusulas y comunicaciones regulatorias. Incluye guardrails de confidencialidad, prevención de fuga de información y logging reforzado. Toda salida requiere revisión y validación de un abogado.",
+    description: "Asistente de redacción para el equipo legal que ayuda en la elaboración de contratos, cláusulas y comunicaciones regulatorias.",
     aiActCategory: "Riesgo Limitado",
     deployedDate: "2025-09-01",
     lastReviewDate: "2025-12-20",
     version: "1.0.1",
     interactionsMonthly: 3400,
+    technicalSheet: {
+      typology: "Copiloto Interno (RAG + LLM)",
+      architecture: "Similar al AIS-004, pero con un RAG alimentado por la base de datos de jurisprudencia y contratos de la entidad. Incluye guardrails de confidencialidad reforzados.",
+      keyGuardrails: [
+        { id: "GRL-021", name: "Sanitización de Datos Confidenciales Pre-LLM" },
+      ],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-019",
@@ -298,12 +449,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Ciberseguridad",
     lifecycleState: "Production",
-    description: "Sistema de triaje y priorización de alertas del SIEM mediante ML. Reduce el ruido de alertas de baja fidelidad y prioriza incidentes de seguridad reales para el equipo SOC. Decisiones de respuesta siempre tomadas por analistas humanos.",
+    description: "Sistema de triaje y priorización de alertas del SIEM mediante ML. Reduce el ruido y prioriza incidentes para el equipo SOC.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2024-08-15",
     lastReviewDate: "2025-11-01",
     version: "2.2.0",
     interactionsMonthly: 850000,
+    technicalSheet: {
+      typology: "Clasificador de Alertas",
+      architecture: "Modelo de clasificación (Random Forest) entrenado con alertas históricas etiquetadas por analistas del SOC. Se integra con el SIEM (Splunk) para enriquecer las alertas con una puntuación de prioridad.",
+      keyGuardrails: [],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
   {
     id: "AIS-020",
@@ -313,12 +470,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Medios de Pago",
     lifecycleState: "Production",
-    description: "Sistema de clasificación y pre-resolución de disputas de pagos con tarjeta. Analiza el historial de la transacción, el comercio y el cliente para proporcionar una recomendación de resolución al agente humano. Reduce el tiempo medio de resolución de 12 a 3 días.",
+    description: "Sistema de clasificación y pre-resolución de disputas de pagos con tarjeta. Proporciona una recomendación de resolución al agente humano.",
     aiActCategory: "Riesgo Limitado",
     deployedDate: "2025-05-20",
     lastReviewDate: "2025-12-05",
     version: "1.3.0",
     interactionsMonthly: 9800,
+    technicalSheet: {
+      typology: "Sistema de Soporte a la Decisión (DSS)",
+      architecture: "Motor de reglas que codifica la normativa de las marcas de tarjeta (Visa, Mastercard) y el historial del cliente para sugerir una acción (aceptar, rechazar, solicitar más información) al agente que gestiona la disputa.",
+      keyGuardrails: [],
+      technicalContact: "pau.casals@tech-services.internal",
+    },
   },
   {
     id: "AIS-021",
@@ -328,12 +491,18 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Marketing Digital",
     lifecycleState: "Approved",
-    description: "Modelo de segmentación de clientes para la personalización de campañas de marketing. Utiliza variables de comportamiento transaccional y de uso de canales. Excluye explícitamente variables protegidas. Pendiente de despliegue en producción.",
+    description: "Modelo de segmentación de clientes para la personalización de campañas de marketing. Utiliza variables de comportamiento transaccional y de uso de canales.",
     aiActCategory: "Riesgo Mínimo",
     deployedDate: "2026-03-01",
     lastReviewDate: "2026-02-15",
     version: "1.0.0",
     interactionsMonthly: 0,
+    technicalSheet: {
+      typology: "Clustering (K-Means)",
+      architecture: "Modelo K-Means que se ejecuta en batch sobre el data lake de clientes para generar segmentos. Los segmentos se cargan en la herramienta de campañas (Salesforce Marketing Cloud).",
+      keyGuardrails: [],
+      technicalContact: "jordi.puig@tech-services.internal",
+    },
   },
   {
     id: "AIS-022",
@@ -343,11 +512,17 @@ export const aiSystemsData: AISystem[] = [
     provider: "Interno",
     businessUnit: "Retención de Clientes",
     lifecycleState: "Draft",
-    description: "Modelo predictivo para identificar clientes con alta probabilidad de cancelación de productos o cambio de entidad. En fase de desarrollo y validación. Pendiente de evaluación de impacto en IA (AIIA) y aprobación por el Comité de Ética de IA.",
+    description: "Modelo predictivo para identificar clientes con alta probabilidad de cancelación de productos o cambio de entidad. En fase de desarrollo y validación.",
     aiActCategory: "Riesgo Limitado – En evaluación",
     deployedDate: undefined,
     lastReviewDate: "2026-02-10",
     version: "0.3.0",
     interactionsMonthly: 0,
+    technicalSheet: {
+      typology: "Clasificador Binario (Churn Prediction)",
+      architecture: "Modelo de clasificación (LightGBM) en desarrollo. Se está evaluando el impacto en equidad y los posibles usos de la predicción (ej. campañas de retención proactivas).",
+      keyGuardrails: [],
+      technicalContact: "david.navarro@tech-services.internal",
+    },
   },
 ];
