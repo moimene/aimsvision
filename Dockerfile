@@ -24,8 +24,5 @@ COPY server/app.py ./app.py
 # Copy built React app from stage 1
 COPY --from=frontend-builder /app/dist ./dist
 
-# Expose port
-EXPOSE 8080
-
-# Start gunicorn
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "--access-logfile", "-"]
+# Use shell form so $PORT is expanded at runtime
+CMD gunicorn app:app --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120 --access-logfile -
