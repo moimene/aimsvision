@@ -30,7 +30,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <span className="font-bold text-[hsl(var(--g-brand-primary))] tracking-tight">Garrigues</span>
               <span className="w-px h-4 bg-[hsl(var(--g-border-default))]" />
               <span className="text-[hsl(var(--g-text-secondary))]">Powered by</span>
-              <span className="font-bold text-[hsl(var(--g-text-primary))] tracking-tight">Galtea</span>
+              <span className="font-bold text-[hsl(var(--g-text-primary))] tracking-tight">g-digital</span>
             </div>
           </header>
 

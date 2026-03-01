@@ -158,7 +158,7 @@ const kpiSummary = [
   { metric: "Tasa media de bloqueo por guardrail", value: "1,2%" },
   { metric: "Guardrails activos desplegados", value: "22" },
   { metric: "Decisiones con explicabilidad SHAP/LIME", value: "100%" },
-  { metric: "Cobertura de auditoría Galtea (sistemas activos)", value: "14 / 17" },
+  { metric: "Cobertura de auditoría g-digital (sistemas activos)", value: "14 / 17" },
 ];
 
 export default function Overview() {

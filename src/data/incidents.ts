@@ -76,7 +76,7 @@ export const incidentsData: Incident[] = [
     owner: "Rosa Llopis",
     impactSummary: "Aproximadamente 45.000 pólizas de seguro de vida y hogar potencialmente afectadas. Revisión actuarial completa en curso. Notificación preventiva a la Dirección General de Seguros y Fondos de Pensiones (DGSFP) en preparación.",
     timeline: [
-      { timestamp: "2026-02-20T10:00:00Z", event: "Auditoría actuarial independiente (Galtea) detecta correlación proxy-género en el modelo de precios", actor: "Galtea" },
+      { timestamp: "2026-02-20T10:00:00Z", event: "Auditoría actuarial independiente (g-digital) detecta correlación proxy-género en el modelo de precios", actor: "g-digital" },
       { timestamp: "2026-02-20T11:30:00Z", event: "Incidente creado con severidad Crítica. Escalado a Dirección de Cumplimiento y CRO", actor: "Rosa Llopis" },
       { timestamp: "2026-02-20T14:00:00Z", event: "Reunión de crisis con Comité Actuarial, Cumplimiento y Tecnología", actor: "Comité Actuarial" },
       { timestamp: "2026-02-21T09:00:00Z", event: "Análisis de impacto iniciado: identificación de pólizas potencialmente afectadas", actor: "Equipo Actuarial" },
@@ -310,7 +310,7 @@ export const incidentsData: Incident[] = [
     owner: "Andrés Molina",
     impactSummary: "Estimadas 340 alertas potencialmente sesgadas en el último trimestre. Todas las alertas ya han sido revisadas por analistas humanos conforme al guardrail GRL-011, por lo que no se han producido acciones incorrectas sobre clientes. El riesgo es de discriminación indirecta en el proceso de onboarding.",
     timeline: [
-      { timestamp: "2026-02-10T10:00:00Z", event: "Auditoría trimestral de equidad AML (Galtea) detecta disparidad estadística por nacionalidad", actor: "Galtea" },
+      { timestamp: "2026-02-10T10:00:00Z", event: "Auditoría trimestral de equidad AML (g-digital) detecta disparidad estadística por nacionalidad", actor: "g-digital" },
       { timestamp: "2026-02-10T11:30:00Z", event: "Incidente creado y asignado a Andrés Molina", actor: "Sistema" },
       { timestamp: "2026-02-11T09:00:00Z", event: "Análisis estadístico de alertas por nacionalidad iniciado", actor: "Equipo de Data Science" },
       { timestamp: "2026-02-14T14:00:00Z", event: "Disparidad confirmada: tasa de alertas 23% superior para 3 grupos de nacionalidades", actor: "Andrés Molina" },
@@ -398,7 +398,7 @@ export const incidentsData: Incident[] = [
     owner: "Enrique Palau",
     impactSummary: "127 informes de idoneidad con el campo incompleto identificados en Q4 2025. Todos han sido revisados por asesores certificados y completados retroactivamente. Ningún cliente recibió una recomendación de inversión basada en un informe incompleto sin la firma del asesor.",
     timeline: [
-      { timestamp: "2026-02-24T09:00:00Z", event: "Auditoría trimestral MiFID II por Galtea detecta 8% de informes con campo incompleto", actor: "Galtea" },
+      { timestamp: "2026-02-24T09:00:00Z", event: "Auditoría trimestral MiFID II por g-digital detecta 8% de informes con campo incompleto", actor: "g-digital" },
       { timestamp: "2026-02-24T10:30:00Z", event: "Incidente creado y asignado a Enrique Palau", actor: "Sistema" },
       { timestamp: "2026-02-24T14:00:00Z", event: "Análisis del comportamiento del guardrail: se detecta el bypass mediante valor 'N/A'", actor: "Jordi Puig" },
       { timestamp: "2026-02-25T09:00:00Z", event: "Parche del guardrail GRL-016: validación de contenido además de presencia", actor: "Jordi Puig" },

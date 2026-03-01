@@ -97,7 +97,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-002", name: "Bloqueo de confirmación sin aceptación SECCI", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-001", testName: "Test de completitud SECCI – Galtea Q1 2026", testDate: "2026-02-15", result: "Pass", source: "Galtea" },
+      { id: "TST-001", testName: "Test de completitud SECCI – g-digital Q1 2026", testDate: "2026-02-15", result: "Pass", source: "g-digital" },
     ],
     galteaMetrics: { accuracyScore: 98, driftScore: 2, lastUpdated: "2026-02-28" },
   },
@@ -118,7 +118,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-003", name: "Guardrail de Detección de Prompt Injection", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-002", testName: "Red team exercise – Prompt Injection", testDate: "2026-02-10", result: "Pass", source: "Galtea" },
+      { id: "TST-002", testName: "Red team exercise – Prompt Injection", testDate: "2026-02-10", result: "Pass", source: "g-digital" },
     ],
   },
   // AIS-002: Motor de Detección de Fraude en Tarjetas v3
@@ -140,7 +140,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-005", name: "Reentrenamiento automático por umbral de drift", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-003", testName: "Análisis de deriva – Enero 2026", testDate: "2026-01-20", result: "Pass", source: "Galtea" },
+      { id: "TST-003", testName: "Análisis de deriva – Enero 2026", testDate: "2026-01-20", result: "Pass", source: "g-digital" },
     ],
     galteaMetrics: { accuracyScore: 97, driftScore: 6, lastUpdated: "2026-02-25" },
   },
@@ -161,7 +161,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-006", name: "Auditoría de equidad geográfica trimestral", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-004", testName: "Análisis de disparidad geográfica Q4 2025", testDate: "2025-12-10", result: "Pass", source: "Galtea" },
+      { id: "TST-004", testName: "Análisis de disparidad geográfica Q4 2025", testDate: "2025-12-10", result: "Pass", source: "g-digital" },
     ],
     galteaMetrics: { fairnessScore: 88, lastUpdated: "2026-02-25" },
   },
@@ -206,7 +206,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-009", name: "Disclaimer obligatorio en toda salida de inversión", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-006", testName: "Test de advice boundary – Escenarios MiFID II", testDate: "2026-01-18", result: "Warning", source: "Galtea" },
+      { id: "TST-006", testName: "Test de advice boundary – Escenarios MiFID II", testDate: "2026-01-18", result: "Warning", source: "g-digital" },
     ],
     galteaMetrics: { accuracyScore: 85, driftScore: 12, lastUpdated: "2026-02-20" },
   },
@@ -250,7 +250,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-013", name: "Revisión humana de todas las denegaciones", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-008", testName: "Análisis de disparidad por sector CNAE", testDate: "2026-01-20", result: "Warning", source: "Galtea" },
+      { id: "TST-008", testName: "Análisis de disparidad por sector CNAE", testDate: "2026-01-20", result: "Warning", source: "g-digital" },
     ],
     galteaMetrics: { fairnessScore: 72, accuracyScore: 89, driftScore: 14, lastUpdated: "2026-02-20" },
   },
@@ -294,7 +294,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-017", name: "Actualización mensual de base de datos de fraude documental", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-010", testName: "Test de robustez ante documentos falsificados", testDate: "2026-01-08", result: "Warning", source: "Galtea" },
+      { id: "TST-010", testName: "Test de robustez ante documentos falsificados", testDate: "2026-01-08", result: "Warning", source: "g-digital" },
     ],
     galteaMetrics: { accuracyScore: 91, driftScore: 8, lastUpdated: "2026-02-15" },
   },
@@ -315,7 +315,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-018", name: "Auditoría de equidad por perfil demográfico semestral", effectiveness: "Partially Effective" },
     ],
     testEvidence: [
-      { id: "TST-011", testName: "Análisis de disparidad demográfica en alertas AML", testDate: "2025-12-20", result: "Warning", source: "Galtea" },
+      { id: "TST-011", testName: "Análisis de disparidad demográfica en alertas AML", testDate: "2025-12-20", result: "Warning", source: "g-digital" },
     ],
     galteaMetrics: { fairnessScore: 78, lastUpdated: "2026-01-20" },
   },
@@ -337,7 +337,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-019", name: "Exclusión de variables de género y proxies", effectiveness: "Ineffective" },
     ],
     testEvidence: [
-      { id: "TST-012", testName: "Auditoría actuarial de equidad de género", testDate: "2025-12-15", result: "Fail", source: "Galtea" },
+      { id: "TST-012", testName: "Auditoría actuarial de equidad de género", testDate: "2025-12-15", result: "Fail", source: "g-digital" },
     ],
     galteaMetrics: { fairnessScore: 52, accuracyScore: 84, lastUpdated: "2026-01-10" },
   },
@@ -380,7 +380,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-022", name: "Handoff humano ante detección de vulnerabilidad", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-014", testName: "Test de tono y lenguaje – Escenarios de hardship", testDate: "2026-01-20", result: "Pass", source: "Galtea" },
+      { id: "TST-014", testName: "Test de tono y lenguaje – Escenarios de hardship", testDate: "2026-01-20", result: "Pass", source: "g-digital" },
     ],
   },
   {
@@ -422,7 +422,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-025", name: "Firma obligatoria del asesor certificado", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-016", testName: "Auditoría de conformidad MiFID II – Q4 2025", testDate: "2025-12-20", result: "Warning", source: "Galtea" },
+      { id: "TST-016", testName: "Auditoría de conformidad MiFID II – Q4 2025", testDate: "2025-12-20", result: "Warning", source: "g-digital" },
     ],
     galteaMetrics: { accuracyScore: 87, driftScore: 11, lastUpdated: "2026-02-10" },
   },
@@ -606,7 +606,7 @@ export const riskData: RiskEntry[] = [
       { id: "GRL-036", name: "El agente proporciona recomendación; el humano decide siempre", effectiveness: "Effective" },
     ],
     testEvidence: [
-      { id: "TST-023", testName: "Análisis de equidad en resoluciones de disputas", testDate: "2025-12-15", result: "Pass", source: "Galtea" },
+      { id: "TST-023", testName: "Análisis de equidad en resoluciones de disputas", testDate: "2025-12-15", result: "Pass", source: "g-digital" },
     ],
     galteaMetrics: { fairnessScore: 91, lastUpdated: "2026-01-15" },
   },

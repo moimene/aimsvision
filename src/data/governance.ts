@@ -269,7 +269,7 @@ export const approvalHistory: ApprovalRecord[] = [
     decisionMaker: "Comité de Cumplimiento",
     date: "2026-01-10",
     outcome: "Approved",
-    notes: "Renovación anual. Se verifica conformidad con AI Act (alto riesgo). Auditoría Galtea Q4 2025 sin hallazgos críticos.",
+    notes: "Renovación anual. Se verifica conformidad con AI Act (alto riesgo). Auditoría g-digital Q4 2025 sin hallazgos críticos.",
   },
   {
     id: "APR-005",
@@ -348,7 +348,7 @@ export const approvalHistory: ApprovalRecord[] = [
     decisionMaker: "Consejo de Administración",
     date: "2025-01-08",
     outcome: "Approved",
-    notes: "Aprobado con revisión trimestral obligatoria y auditoría externa anual por Galtea.",
+    notes: "Aprobado con revisión trimestral obligatoria y auditoría externa anual por g-digital.",
   },
   {
     id: "APR-013",

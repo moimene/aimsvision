@@ -225,11 +225,11 @@ function RiskDetailPanel({ risk, onClose }: { risk: RiskEntry; onClose: () => vo
             )}
           </section>
 
-          {/* Galtea Metrics */}
+          {/* g-digital Metrics */}
           {risk.galteaMetrics && (
             <section>
               <h3 className="text-xs font-medium text-[hsl(var(--g-text-secondary))] uppercase tracking-wider mb-[var(--g-space-3)]">
-                Galtea Metrics <span className="text-[hsl(var(--g-text-secondary))] font-normal">(Read-only)</span>
+                g-digital Metrics <span className="text-[hsl(var(--g-text-secondary))] font-normal">(Read-only)</span>
               </h3>
               <div className="bg-[hsl(var(--g-surface-card))] border border-[hsl(var(--g-border-default))] rounded-[var(--g-radius-md)] overflow-hidden">
                 <Table>

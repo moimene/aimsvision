@@ -291,8 +291,8 @@ export const eventLogData: EventLogEntry[] = [
     eventType: "Audit",
     decision: "Processed",
     referenceId: "AUD-2026-0228-KYC",
-    description: "Auditoría trimestral de equidad en alertas AML iniciada por Galtea. Análisis de 2.850 alertas del Q4 2025. Objetivo: detectar sesgos demográficos en la tasa de alertas.",
-    actor: "Galtea",
+    description: "Auditoría trimestral de equidad en alertas AML iniciada por g-digital. Análisis de 2.850 alertas del Q4 2025. Objetivo: detectar sesgos demográficos en la tasa de alertas.",
+    actor: "g-digital",
   },
   // AIS-011: Motor de Optimización de Precios de Seguros
   {
@@ -304,7 +304,7 @@ export const eventLogData: EventLogEntry[] = [
     decision: "Flagged",
     referenceId: "INS-2026-0228-NC-001",
     description: "ALERTA DE NO CONFORMIDAD: Auditoría actuarial detecta correlación del 0.68 entre variable proxy 'código postal' y género. Guardrail GRL-012 marcado como INEFECTIVO. Escalado a Comité Actuarial y Dirección de Cumplimiento.",
-    actor: "Galtea",
+    actor: "g-digital",
   },
   {
     id: "EVT-020",
@@ -499,8 +499,8 @@ export const eventLogData: EventLogEntry[] = [
     eventType: "Audit",
     decision: "Processed",
     referenceId: "AUD-2026-0227-LOAN",
-    description: "Auditoría de conformidad SECCI completada por Galtea. Muestra: 500 conversaciones de contratación. Resultado: 99,2% de conformidad. 4 casos con presentación incompleta identificados y corregidos.",
-    actor: "Galtea",
+    description: "Auditoría de conformidad SECCI completada por g-digital. Muestra: 500 conversaciones de contratación. Resultado: 99,2% de conformidad. 4 casos con presentación incompleta identificados y corregidos.",
+    actor: "g-digital",
   },
   {
     id: "EVT-037",
@@ -532,8 +532,8 @@ export const eventLogData: EventLogEntry[] = [
     eventType: "Audit",
     decision: "Flagged",
     referenceId: "AUD-2026-0224-MIF",
-    description: "Auditoría trimestral MiFID II por Galtea. Hallazgo: en el 8% de los informes de idoneidad, el apartado de 'capacidad para soportar pérdidas' no estaba completado antes de la generación del informe. Guardrail GRL-016 marcado como parcialmente efectivo. Plan de mejora requerido.",
-    actor: "Galtea",
+    description: "Auditoría trimestral MiFID II por g-digital. Hallazgo: en el 8% de los informes de idoneidad, el apartado de 'capacidad para soportar pérdidas' no estaba completado antes de la generación del informe. Guardrail GRL-016 marcado como parcialmente efectivo. Plan de mejora requerido.",
+    actor: "g-digital",
   },
   {
     id: "EVT-040",
