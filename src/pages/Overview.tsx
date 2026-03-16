@@ -25,7 +25,7 @@ const productionSystems = aiSystemsData.filter(s => s.lifecycleState === "Produc
 const highRiskSystems = aiSystemsData.filter(s => s.riskLevel === "High").length;
 const nonCompliantSystems = aiSystemsData.filter(s => s.status === "Non-Compliant").length;
 const atRiskSystems = aiSystemsData.filter(s => s.status === "At Risk").length;
-const developmentSystems = aiSystemsData.filter(s => s.lifecycleState === "Development").length;
+const developmentSystems = aiSystemsData.filter(s => s.lifecycleState === "Draft").length;
 
 const summaryData = [
   { metric: "Total Sistemas de IA en Alcance", value: totalSystems },
