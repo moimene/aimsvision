@@ -63,15 +63,16 @@
  
  ### 🎯 Core Functions
  
- | Capability | Description |
- |------------|-------------|
- | **AI Asset Registry** | Complete inventory with lifecycle tracking |
- | **Risk Scoring** | Impact × Probability matrix with heat maps |
- | **Control Mapping** | Link risks to operational guardrails |
- | **Approval Workflows** | Multi-stage governance with decision history |
- | **Incident Management** | Full CAPA lifecycle with lessons learned |
- | **Audit Evidence** | Exportable documentation packages |
- | **ISO Compliance** | Clause-by-clause status tracking |
+| Capability | Description |
+|------------|-------------|
+| **AI Asset Registry** | Complete inventory with lifecycle tracking |
+| **Risk Scoring** | Impact × Probability matrix with heat maps |
+| **Control Mapping** | Link risks to operational guardrails |
+| **Approval Workflows** | Multi-stage governance with decision history |
+| **Incident Management** | Full CAPA lifecycle with lessons learned |
+| **Audit Evidence** | Exportable documentation packages |
+| **ISO Compliance** | Clause-by-clause status tracking |
+| **Harvey — Legal AI** | Integrated assistant for regulatory interpretation (AI Act, MiFID II, GDPR)
  
  ### 🔐 Governance Features
  
@@ -273,12 +274,39 @@
  
  **Non-Conformity Severity:**
  - **Major NC**: Significant gap requiring immediate action
- - **Minor NC**: Opportunity for improvement
- - **Observation**: Best practice recommendation
+- **Minor NC**: Opportunity for improvement
+- **Observation**: Best practice recommendation
 
 ---
 
- ## Supported Workflows
+## Harvey — Legal AI Assistant
+
+AIMS includes **Harvey**, an integrated AI assistant specialized in applicable regulations for artificial intelligence systems.
+
+### Harvey Capabilities
+
+| Area | Example Queries |
+|------|-----------------|
+| **AI Act (EU)** | System classification, obligations by category, specific articles |
+| **MiFID II** | Compliance for trading algorithms, execution policies |
+| **GDPR** | Data subject rights, legal bases, DPIA for AI |
+| **AML** | Fraud detection with AI, transaction monitoring |
+| **AIMS Console** | Guardrail interpretation, compliance states, approval flows |
+
+### Interface
+
+- **Floating button**: Instant access from any module
+- **Preserved context**: Conversation history during the session
+- **Suggested questions**: Predefined FAQs
+- **Markdown format**: Responses with bold, lists, and quotes
+
+### Security
+
+Harvey communicates through a **backend proxy** that never exposes the authentication token to the browser. Conversations are processed via the Flask server before being sent to the Harvey API.
+
+---
+
+## Supported Workflows
  
  AIMS supports the following end-to-end governance workflows:
  
