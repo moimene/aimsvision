@@ -30,6 +30,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { FileDown, FileText, FileJson, AlertTriangle, AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { mockAliniaEvents, mockAliniaStats } from "@/data/mockAlinia";
 
 function formatTimestamp(isoString: string): string {
   const date = new Date(isoString);
@@ -357,6 +358,103 @@ export default function Monitoring() {
                     </TableCell>
                   </TableRow>
                 ))}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+
+        {/* Alinia — Guardrail Compliance Feed */}
+        <section aria-labelledby="alinia-feed" className="mt-[var(--g-space-7)]">
+          <div className="flex items-center justify-between mb-[var(--g-space-4)]">
+            <div className="flex items-center gap-[var(--g-space-3)]">
+              <h2
+                id="alinia-feed"
+                className="text-sm font-medium text-[hsl(var(--g-text-secondary))] uppercase tracking-wider"
+              >
+                Alinia — Guardrail Compliance Feed
+              </h2>
+              <span className="inline-flex items-center gap-[var(--g-space-1)] text-[10px] font-medium text-[hsl(var(--g-status-success))]">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--g-status-success))] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--g-status-success))]" />
+                </span>
+                Activo · Harvey
+              </span>
+            </div>
+          </div>
+
+          <p className="text-xs text-[hsl(var(--g-text-secondary))] mb-[var(--g-space-4)]">
+            Interceptaciones en tiempo real · MiFID II · EU AI Act · GDPR · Proveedor: Alinia AI
+          </p>
+
+          {/* Alinia KPI Summary */}
+          <div className="bg-[hsl(var(--g-surface-card))] border border-[hsl(var(--g-border-default))] rounded-[var(--g-radius-lg)] overflow-hidden mb-[var(--g-space-4)]">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-[hsl(var(--g-surface-subtle))] hover:bg-[hsl(var(--g-surface-subtle))]">
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Monitorizadas</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Permitidas</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Flaggeadas</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Bloqueadas</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Regla más activa</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="hover:bg-[hsl(var(--g-surface-hover))]">
+                  <TableCell className="text-[hsl(var(--g-text-primary))] font-semibold">{mockAliniaStats.total}</TableCell>
+                  <TableCell>
+                    <StatusIndicator status="success" text={String(mockAliniaStats.allowed)} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusIndicator status="warning" text={String(mockAliniaStats.flagged)} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusIndicator status="critical" text={String(mockAliniaStats.blocked)} />
+                  </TableCell>
+                  <TableCell className="text-[hsl(var(--g-text-secondary))] font-mono text-xs">{mockAliniaStats.topRule}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Alinia Events Table */}
+          <div className="bg-[hsl(var(--g-surface-card))] border border-[hsl(var(--g-border-default))] rounded-[var(--g-radius-lg)] overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-[hsl(var(--g-surface-subtle))] hover:bg-[hsl(var(--g-surface-subtle))]">
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Hora</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-36">Sistema IA</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium">Consulta</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Acción</TableHead>
+                  <TableHead className="text-[hsl(var(--g-text-primary))] font-medium w-28">Normativa</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockAliniaEvents.map((event) => {
+                  const actionMapping: Record<string, { status: "success" | "warning" | "critical" | "neutral"; text: string }> = {
+                    allowed: { status: "success", text: "Permitida" },
+                    flagged: { status: "warning", text: "Flaggeada" },
+                    blocked: { status: "critical", text: "Bloqueada" },
+                  };
+                  const minutesAgo = Math.round((Date.now() - event.timestamp.getTime()) / 60_000);
+                  const timeLabel = minutesAgo < 60 ? `hace ${minutesAgo} min` : `hace ${Math.round(minutesAgo / 60)} h`;
+
+                  return (
+                    <TableRow key={event.id} className="hover:bg-[hsl(var(--g-surface-hover))]">
+                      <TableCell className="text-[hsl(var(--g-text-secondary))] font-mono text-xs">{timeLabel}</TableCell>
+                      <TableCell className="text-[hsl(var(--g-text-primary))] text-xs">{event.aiSystemId}</TableCell>
+                      <TableCell className="text-[hsl(var(--g-text-secondary))] text-xs truncate max-w-[280px]" title={event.inputText}>
+                        {event.inputText}
+                      </TableCell>
+                      <TableCell>
+                        <StatusIndicator status={actionMapping[event.action].status} text={actionMapping[event.action].text} />
+                      </TableCell>
+                      <TableCell className="text-[hsl(var(--g-text-secondary))] text-xs font-medium">
+                        {event.regulation ?? "—"}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
