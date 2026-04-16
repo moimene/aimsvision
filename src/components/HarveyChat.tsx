@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Scale, X, Send, Loader2, ChevronDown, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { mockAliniaCheck } from "@/data/mockAlinia";
+import { AliniaStatusBadge } from "@/components/AliniaStatusBadge";
 
 interface Message {
   role: "user" | "assistant";
@@ -187,15 +189,21 @@ export function HarveyChat() {
                         <Scale className="h-3.5 w-3.5 text-[hsl(var(--sidebar-foreground))]" />
                       </div>
                     )}
-                    <div
-                      className={cn(
-                        "max-w-[85%] rounded-[var(--g-radius-md)] px-3 py-2 text-sm leading-relaxed",
-                        msg.role === "user"
-                          ? "bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-foreground))]"
-                          : "bg-[hsl(var(--g-surface-card))] border border-[hsl(var(--g-border-default))] text-[hsl(var(--g-text-primary))]"
-                      )}
-                      dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
-                    />
+                    <div className="max-w-[85%] flex flex-col gap-1">
+                      <div
+                        className={cn(
+                          "rounded-[var(--g-radius-md)] px-3 py-2 text-sm leading-relaxed",
+                          msg.role === "user"
+                            ? "bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-foreground))]"
+                            : "bg-[hsl(var(--g-surface-card))] border border-[hsl(var(--g-border-default))] text-[hsl(var(--g-text-primary))]"
+                        )}
+                        dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+                      />
+                      {msg.role === "assistant" && (() => {
+                        const verdict = mockAliniaCheck(msg.content);
+                        return <AliniaStatusBadge verdict={verdict} />;
+                      })()}
+                    </div>
                   </div>
                 ))}
                 {loading && (

@@ -38,6 +38,7 @@ export interface Guardrail {
   reviewFrequency?: string;      // Frecuencia de revisión
   updateTriggers?: string[];     // Disparadores de actualización
   linkedRiskIds: string[];
+  provider?: string;             // External provider (e.g. "Alinia AI")
   changeHistory: ChangeHistoryEntry[];
   lastReviewedDate: string;
   lastReviewedBy: string;
@@ -716,6 +717,37 @@ export const guardrailsData: Guardrail[] = [
     ],
     lastReviewedDate: "2025-12-20",
     lastReviewedBy: "Alejandro Vidal",
+  },
+
+  // ─── Alinia AI: Guardrail de Compliance en Tiempo Real ─────────────────────
+  {
+    id: "GRL-ALN-001",
+    name: "Alinia Investment & PII Guard",
+    category: "Compliance",
+    aiSystemId: "AIS-008",
+    aiSystemName: "Harvey — Asistente Jurídico IA",
+    action: "Block",
+    humanOversightRequired: false,
+    humanOversightSpec: {
+      required: false,
+      notes: "Interceptación automática en tiempo real. Revisión periódica por Cumplimiento y DPO sobre eficacia de reglas.",
+    },
+    status: "Active",
+    version: "1.0.0",
+    description: "Interceptación en tiempo real de respuestas del asistente jurídico Harvey mediante Alinia AI. Bloquea consejo de inversión no autorizado (MiFID II / ESMA), exposición de PII (GDPR) y contenido relacionado con blanqueo de capitales (AML/6AMLD). Opera como capa de compliance entre el modelo de lenguaje y el usuario final.",
+    legalBasis: "MiFID II arts. 24–25; RGPD arts. 5(1)(c) y 32; Directiva (UE) 2018/843 (6AMLD); AI Act art. 14",
+    legalJustification: "Las respuestas generadas por un LLM pueden inadvertidamente constituir asesoramiento financiero personalizado, exponer datos personales o facilitar información sensible relacionada con operaciones sospechosas. Alinia actúa como guardrail de output que intercepta y clasifica cada respuesta antes de su entrega al usuario, garantizando el cumplimiento de las obligaciones de conducta MiFID II, los principios de minimización de datos del RGPD y las restricciones AML.",
+    activationCondition: "Detección de keywords o patrones semánticos relacionados con asesoramiento de inversión, exposición de PII (DNI, IBAN, NIF) o terminología AML en el output del modelo antes de ser presentado al usuario.",
+    nonComplianceConsequence: "Asesoramiento financiero no autorizado, exposición de datos personales, posibles sanciones de CNMV, AEPD y SEPBLAC, y daño reputacional significativo.",
+    reviewFrequency: "Trimestral; revisión de reglas y umbrales tras incidentes o cambios normativos.",
+    updateTriggers: ["Cambio normativo (MiFID II, RGPD, AML)", "Incidente de compliance detectado", "Actualización del modelo de lenguaje", "Nuevo tipo de consulta no cubierto"],
+    linkedRiskIds: ["RSK-003"],
+    provider: "Alinia AI",
+    changeHistory: [
+      { version: "1.0.0", date: "2026-03-01", changedBy: "Jordi Puig", description: "Despliegue inicial — integración Alinia AI como guardrail de output para Harvey" },
+    ],
+    lastReviewedDate: "2026-03-15",
+    lastReviewedBy: "Carmen Rodríguez",
   },
 
   // ─── AIS-009: Motor de Recomendación de Productos ─────────────────────────
