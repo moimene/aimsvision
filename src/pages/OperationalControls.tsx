@@ -252,6 +252,12 @@ function GuardrailDetailPanel({ guardrail, onClose }: { guardrail: Guardrail; on
                     <TableCell className="text-[hsl(var(--g-text-secondary))] text-xs">Versión</TableCell>
                     <TableCell className="text-[hsl(var(--g-text-primary))] font-mono text-sm">{guardrail.version}</TableCell>
                   </TableRow>
+                  {guardrail.provider && (
+                    <TableRow className="hover:bg-[hsl(var(--g-surface-hover))]">
+                      <TableCell className="text-[hsl(var(--g-text-secondary))] text-xs">Proveedor</TableCell>
+                      <TableCell className="text-[hsl(var(--g-text-primary))] text-sm font-medium">{guardrail.provider}</TableCell>
+                    </TableRow>
+                  )}
                   <TableRow className="hover:bg-[hsl(var(--g-surface-hover))]">
                     <TableCell className="text-[hsl(var(--g-text-secondary))] text-xs">Última revisión</TableCell>
                     <TableCell className="text-[hsl(var(--g-text-primary))] text-sm">{guardrail.lastReviewedDate} · {guardrail.lastReviewedBy}</TableCell>
