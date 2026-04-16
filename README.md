@@ -816,35 +816,43 @@
  └─────────────────────────────────────────────────────────────────────────┘
  ```
 
- ### Data Flow
+### Data Flow
 
- ```
- ┌─────────────────────────────────────────────────────────────────────────┐
- │                           DATA LAYER                                    │
- └─────────────────────────────────────────────────────────────────────────┘
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           DATA LAYER                                    │
+└─────────────────────────────────────────────────────────────────────────┘
 
-   CURRENT (Phase 1)                    FUTURE (Phase 2+)
-   ─────────────────                    ─────────────────
+    FRONTEND (React)                    BACKEND (Flask)
+    ─────────────────                    ────────────────
 
-   ┌─────────────┐                      ┌─────────────────────────────┐
-   │   Static    │                      │      Lovable Cloud          │
-   │   Mock Data │                      │  ┌───────────────────────┐  │
-   │             │        ──────▶       │  │    PostgreSQL DB      │  │
-   │ aiSystems.ts│                      │  │    (Supabase)         │  │
-   │ risks.ts    │                      │  └───────────────────────┘  │
-   │ incidents.ts│                      │  ┌───────────────────────┐  │
-   │ audit.ts    │                      │  │    Auth (Supabase)    │  │
-   └─────────────┘                      │  └───────────────────────┘  │
-                                        │  ┌───────────────────────┐  │
-                                        │  │   Edge Functions      │  │
-                                        │  └───────────────────────┘  │
-                                        │  ┌───────────────────────┐  │
-                                        │  │   File Storage        │  │
-                                        │  └───────────────────────┘  │
-                                        └─────────────────────────────┘
- ```
+    ┌─────────────┐                     ┌─────────────────────────┐
+    │   React SPA │────────────────────▶│   Flask Server          │
+    │   (Vite)    │   /api/chat         │   (Railway)             │
+    └─────────────┘                     │  ┌───────────────────┐  │
+                                        │  │ Harvey Proxy      │  │
+    CURRENT (Phase 1)                   │  │ • /api/chat       │  │
+    ─────────────────                   │  │ • /api/health     │  │
+                                        │  └───────────────────┘  │
+    ┌─────────────┐                     │                         │
+    │   Static    │                     │  Environment:           │
+    │   Mock Data │                     │  • HARVEY_TOKEN         │
+    │             │                     │  • HARVEY_ENDPOINT_V1   │
+    └─────────────┘                     └─────────────────────────┘
 
- ### Entity Relationships
+    FUTURE (Phase 2+)
+    ─────────────────
+
+    ┌─────────────────────────────────────────┐
+    │           Lovable Cloud                 │
+    │  ┌─────────────────────────────────┐    │
+    │  │    PostgreSQL + Auth            │    │
+    │  │    (Supabase)                   │    │
+    │  └─────────────────────────────────┘    │
+    └─────────────────────────────────────────┘
+```
+
+### Entity Relationships
  
  ```
  ┌─────────────────────────────────────────────────────────────────────────┐
@@ -1125,30 +1133,54 @@
 
 ---
 
- ## Getting Started
- 
- ### Prerequisites
- 
- - Node.js 18+
- - npm or bun
- 
- ### Installation
- 
- ```bash
- # Clone the repository
- git clone <repository-url>
- cd aims-console
- 
- # Install dependencies
- npm install
- 
- # Start development server
- npm run dev
- ```
- 
- The application will be available at `http://localhost:5173`
- 
- ### Build for Production
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm o pnpm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd aims-console
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+La aplicación estará disponible en `http://localhost:5173`
+
+> **Nota sobre Harvey**: El asistente jurídico requiere el backend Flask configurado. En desarrollo local con `npm run dev`, las llamadas a `/api/chat` fallarán. Para desarrollo con backend completo, usa el despliegue en Railway (ver abajo).
+
+### Deploy en Railway (Producción)
+
+Para desplegar AIMS con el asistente Harvey activo:
+
+1. **Crear proyecto en Railway**
+   - Conectar repositorio GitHub
+   - Railway detecta automáticamente el `Dockerfile`
+
+2. **Configurar variables de entorno**
+
+   | Variable | Descripción |
+   |----------|-------------|
+   | `HARVEY_TOKEN` | Token de autenticación para la API de Harvey |
+   | `HARVEY_ENDPOINT_V1` | URL del endpoint de Harvey (por defecto: `https://eu.api.harvey.ai/api/v1/completion`) |
+   | `PORT` | Puerto del servidor (Railway lo inyecta automáticamente) |
+
+3. **Verificar despliegue**
+   - Health check: `https://tu-dominio.up.railway.app/api/health`
+   - App: `https://tu-dominio.up.railway.app`
+
+Ver guía completa en [`DEPLOY.md`](./DEPLOY.md)
+
+### Build for Production
  
  ```bash
  npm run build
@@ -1189,23 +1221,30 @@
  
  ---
  
- ## API Reference
- 
- *API documentation will be available when backend integration (Phase 2) is complete.*
- 
- ### Planned Endpoints
- 
- | Method | Endpoint | Description |
- |--------|----------|-------------|
- | GET | `/api/systems` | List all AI systems |
- | GET | `/api/systems/:id` | Get system details |
- | POST | `/api/systems` | Create new system |
- | PUT | `/api/systems/:id` | Update system |
- | DELETE | `/api/systems/:id` | Archive system |
- | GET | `/api/risks` | List all risks |
- | GET | `/api/incidents` | List all incidents |
- | GET | `/api/audit/clauses` | List ISO clauses |
- | POST | `/api/evidence/export` | Generate evidence pack |
+## API Reference
+
+### Backend Endpoints (Flask)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/chat` | Proxy para consultas a Harvey |
+| GET | `/api/health` | Health check del servidor |
+
+### Frontend API (Planeado)
+
+*La API completa del backend estará disponible cuando se complete la integración con Lovable Cloud (Fase 2).*
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/systems` | Listar todos los sistemas de IA |
+| GET | `/api/systems/:id` | Obtener detalles de un sistema |
+| POST | `/api/systems` | Crear nuevo sistema |
+| PUT | `/api/systems/:id` | Actualizar sistema |
+| DELETE | `/api/systems/:id` | Archivar sistema |
+| GET | `/api/risks` | Listar todos los riesgos |
+| GET | `/api/incidents` | Listar todos los incidentes |
+| GET | `/api/audit/clauses` | Listar cláusulas ISO |
+| POST | `/api/evidence/export` | Generar paquete de evidencia |
  
  ---
  
