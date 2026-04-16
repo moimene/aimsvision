@@ -106,7 +106,7 @@ export function AppSidebar() {
                 AIMS Console
               </h1>
               <p className="text-xs text-[hsl(var(--sidebar-foreground)/0.7)] truncate">
-                ISO/IEC 42001
+                eIDAS  .env
               </p>
             </div>
           )}
