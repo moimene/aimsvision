@@ -1,4 +1,4 @@
-import { ShieldCheck, ShieldAlert, ShieldOff } from "lucide-react";
+import { ShieldCheck, ShieldAlert, ShieldOff, Stamp } from "lucide-react";
 import type { AliniaVerdict } from "@/data/mockAlinia";
 
 const config = {
@@ -37,6 +37,10 @@ export function AliniaStatusBadge({ verdict }: { verdict: AliniaVerdict }) {
       {verdict.regulation && (
         <span className="opacity-70">· {verdict.regulation}</span>
       )}
+      <span className="opacity-60 inline-flex items-center gap-0.5 ml-0.5" title="Sellado con Sello de Tiempo Cualificado (eIDAS / RFC 3161)">
+        <Stamp className="h-2.5 w-2.5" aria-hidden="true" />
+        <span>eIDAS</span>
+      </span>
     </span>
   );
 }
