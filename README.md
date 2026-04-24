@@ -1315,6 +1315,6 @@ Proprietary — Garrigues / Galtea
  
  [Documentation](https://docs.aims.io) • [Support](mailto:support@galtea.io) • [Changelog](./CHANGELOG.md)
  
- © 2024 Garrigues / Galtea — Proprietary
+ © 2026 Garrigues — Proprietary
 
 </div>
